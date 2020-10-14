@@ -1,7 +1,7 @@
-import discord
-import commands
+import discord, commands, re
 
 client = discord.Client()
+sub_reg = re.compile(r"(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)", "g")
 
 @client.event
 async def on_ready():
@@ -19,18 +19,27 @@ async def on_message(msg):
         return
 
     msglst = msg.content.split(" ")
+    """
     if not msglst[0].startswith("fl!"):
         return
+    """
 
-    command = msglst[0][3:]
-    if command == "help":
-        await commands.helpmsg(msg)
-    elif command == "game":
-        await commands.game(msg)
-    elif command == "gamedel":
-        await commands.gamedel(msg)
-    else:
-        await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference.".format(command))
+    if msglst[0].startswith("fl!"):
+        command = msglst[0][3:]
+        if command == "help":
+            await commands.helpmsg(msg)
+        elif command == "game":
+            await commands.game(msg)
+        elif command == "gamedel":
+            await commands.gamedel(msg)
+        else:
+            await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference.".format(command))
+        return
+    
+    subr_match = sub_reg.match(msg.content)
+    if subr_match:
+        await commands.subreddit(msg, subr_match)
+
 
 
 

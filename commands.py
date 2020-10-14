@@ -85,6 +85,14 @@ async def gamedel(msg):
     if output:
         await msg.delete()
 
+async def subreddit(msg, match):
+    desc = "**Subreddits I found in your message:**"
+    for subr in match:
+        desc += "\n[{0}](https://reddit.com/{0})".format(subr)
+    
+    embed = discord.Embed(description=desc)
+    msg.channel.send(embed=embed)
+
 async def failure(msg, error):
     await msg.add_reaction("❌")
     await msg.channel.send("Error: " + error)
