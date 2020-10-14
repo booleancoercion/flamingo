@@ -85,7 +85,7 @@ async def gamedel(msg):
     if output:
         await msg.delete()
 
-async def subreddit(msg, match):
+async def subreddit(msg, matches):
     desc = "**Subreddits I found in your message:**"
     isempty = True
     for match in matches:
