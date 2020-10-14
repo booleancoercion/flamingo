@@ -9,12 +9,16 @@ async def helpmsg(msg):
 """`fl!help` - Displays this message.
 `fl!game <code> <server> [map] [imps] [confirm] [visual]` - Displays a custom formatted message according to the game info. \
 Default settings are: skeld, 2, off, off.
-`fl!gamedel` - Same as fl!game, except it deletes your own message.""")
+`fl!gamedel` - Same as fl!game, except it deletes your own message.
+`fl!cat` - Displays a random cat picture. Only works in spam channels.
+`fl!dog` - Displays a random dog picture. Only works in spam channels.""")
     
     await msg.channel.send(embed=embed)
 
 async def game(msg):
     msglst = msg.content.split(" ")
+    if msg.content.endswith("@here"):
+        msglst = msglst[:-1]
 
     if len(msglst) < 3:
         return await failure(msg, "too few arguments.")
@@ -105,7 +109,6 @@ async def cat(msg):
     embed = discord.Embed().set_image(url=link)
     await msg.channel.send(embed=embed)
 
-
 async def dog(msg):
     if msg.channel.name.find("spam") == -1:
         return await failure(msg, "not a spam channel.")
@@ -113,6 +116,15 @@ async def dog(msg):
     link = r.json()["url"]
     embed = discord.Embed().set_image(url=link)
     await msg.channel.send(embed=embed)
+
+async def say(msg):
+    if msg.author.id != 214732126950522880:
+        await msg.channel.send("Unknown command `say`. Please use fl!help for reference.")
+        return
+    
+    await msg.delete()
+    await msg.channel.send(msg.content[7:])
+    
 
 async def failure(msg, error):
     await msg.add_reaction("❌")

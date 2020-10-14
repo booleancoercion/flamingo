@@ -36,6 +36,8 @@ async def on_message(msg):
             await commands.cat(msg)
         elif command == "dog":
             await commands.dog(msg)
+        elif command == "say":
+            await commands.say(msg)
         else:
             await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference.".format(command))
         return
