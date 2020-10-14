@@ -87,9 +87,13 @@ async def gamedel(msg):
 
 async def subreddit(msg, match):
     desc = "**Subreddits I found in your message:**"
-    for subr in match.groups():
-        desc += "\n[{0}](https://reddit.com/{0})".format(subr)
-    
+    isempty = True
+    for match in matches:
+        isempty = False
+        desc += "\n[{0}](https://reddit.com/{0})".format(match.group(1))
+    if isempty:
+        return
+
     embed = discord.Embed(description=desc)
     await msg.channel.send(embed=embed)
 

@@ -1,7 +1,7 @@
 import discord, commands, re
 
 client = discord.Client()
-sub_reg = re.compile(r"(?:(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z).*)+")
+sub_reg = re.compile(r"(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
 
 @client.event
 async def on_ready():
@@ -36,9 +36,8 @@ async def on_message(msg):
             await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference.".format(command))
         return
     
-    subr_match = sub_reg.match(msg.content)
-    if subr_match:
-        await commands.subreddit(msg, subr_match)
+    matches = sub_reg.finditer(msg.content)
+    await commands.subreddit(msg, matches)
 
 
 
