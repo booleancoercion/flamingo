@@ -1,7 +1,7 @@
 import discord, commands, re
 
 client = discord.Client()
-sub_reg = re.compile(r"(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)", "g")
+sub_reg = re.compile(r"(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
 
 @client.event
 async def on_ready():
