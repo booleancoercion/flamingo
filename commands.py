@@ -87,7 +87,7 @@ async def gamedel(msg):
 
 async def subreddit(msg, match):
     desc = "**Subreddits I found in your message:**"
-    for subr in match:
+    for subr in match.groups():
         desc += "\n[{0}](https://reddit.com/{0})".format(subr)
     
     embed = discord.Embed(description=desc)
