@@ -1,4 +1,4 @@
-import discord
+import discord, requests
 
 images = {"The Skeld":"https://i.imgur.com/1DrQQAC.png",
           "Mira HQ":"https://i.imgur.com/HiDaCnp.png",
@@ -95,6 +95,23 @@ async def subreddit(msg, matches):
         return
 
     embed = discord.Embed(description=desc)
+    await msg.channel.send(embed=embed)
+
+async def cat(msg):
+    if msg.channel.name.find("spam") == -1:
+        return await failure(msg, "not a spam channel.")
+    r = requests.get("http://aws.random.cat/meow")
+    link = r.json()["file"]
+    embed = discord.Embed().set_image(url=link)
+    await msg.channel.send(embed=embed)
+
+
+async def dog(msg):
+    if msg.channel.name.find("spam") == -1:
+        return await failure(msg, "not a spam channel.")
+    r = requests.get("https://random.dog/woof.json?include=jpg,jpeg,png,gif")
+    link = r.json()["url"]
+    embed = discord.Embed().set_image(url=link)
     await msg.channel.send(embed=embed)
 
 async def failure(msg, error):

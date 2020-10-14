@@ -32,6 +32,10 @@ async def on_message(msg):
             await commands.game(msg)
         elif command == "gamedel":
             await commands.gamedel(msg)
+        elif command == "cat":
+            await commands.cat(msg)
+        elif command == "dog":
+            await commands.dog(msg)
         else:
             await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference.".format(command))
         return
