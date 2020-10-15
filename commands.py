@@ -11,7 +11,9 @@ async def helpmsg(msg):
 Default settings are: skeld, 2, off, off.
 `fl!gamedel` - Same as fl!game, except it deletes your own message.
 `fl!cat` - Displays a random cat picture. Only works in spam channels.
-`fl!dog` - Displays a random dog picture. Only works in spam channels.""")
+`fl!dog` - Displays a random dog picture. Only works in spam channels.
+`fl!inspire` - Generate inspiring imagery. Only works in spam channels.
+`fl!mayo` - naret.""")
     
     await msg.channel.send(embed=embed)
 
@@ -116,15 +118,24 @@ async def dog(msg):
     link = r.json()["url"]
     embed = discord.Embed().set_image(url=link)
     await msg.channel.send(embed=embed)
+    
+async def inspire(msg):
+    if msg.channel.name.find("spam") == -1:
+        return await failure(msg, "not a spam channel.")
+    r = requests.get("https://inspirobot.me/api?generate=true")
+    link = r.text
+    embed = discord.Embed().set_image(url=link)
+    await msg.channel.send(embed=embed)
 
-async def say(msg):
-    if msg.author.id != 214732126950522880:
-        await msg.channel.send("Unknown command `say`. Please use fl!help for reference.")
-        return
+async def mayo(msg):
+    if msg.author.id != 311715723489705986:
+        return await failure(msg, "you're not naret.")
     
-    await msg.delete()
-    await msg.channel.send(msg.content[7:])
-    
+    await msg.channel.send("<:Naret:765627711778848851>")
+
+reg = {"help":helpmsg, "game":game, "gamedel":gamedel, "cat":cat, "kitten":cat,\
+       "dog":dog, "puppy":dog, "doggo":dog, "catto":cat, "inspire":inspire,\
+       "mayo":mayo}
 
 async def failure(msg, error):
     await msg.add_reaction("❌")
