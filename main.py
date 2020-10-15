@@ -49,7 +49,6 @@ async def on_message(msg):
                 target_channel = channel
                 break
         else:
-            cmds.remove("say")
             closest = min(cmds, key=(lambda x: commands.distance_fast(x, command)))
             if commands.distance_fast(closest, command) < 3:
                 await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference. Perhaps you meant `{1}`?".format(command, closest))
