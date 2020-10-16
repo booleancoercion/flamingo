@@ -4,12 +4,15 @@ images = {"The Skeld":"https://i.imgur.com/1DrQQAC.png",
           "Mira HQ":"https://i.imgur.com/HiDaCnp.png",
           "Polus":"https://i.imgur.com/449xJFg.png"}
 
+reposts = dict()
+
 async def helpmsg(msg):
     embed = discord.Embed(title="Available commands:", description=\
 """`fl!help` - Displays this message.
 `fl!game <code> <server> [map] [imps] [confirm] [visual]` - Displays a custom formatted message according to the game info. \
 Default settings are: skeld, 2, off, off.
 `fl!gamedel` - Same as fl!game, except it deletes your own message.
+`fl!repost` - Reposts the last advertised game from this server, provided it's not too old.
 `fl!cat` - Displays a random cat picture. Only works in spam channels.
 `fl!dog` - Displays a random dog picture. Only works in spam channels.
 `fl!inspire` - Generate inspiring imagery. Only works in spam channels.
@@ -84,6 +87,7 @@ async def game(msg):
             icon_url=icon)
     
     await msg.channel.send(embed=embed)
+    reposts[msg.guild.id] = (embed, msg.created_at)
     return True
 
 async def gamedel(msg):
@@ -133,9 +137,23 @@ async def mayo(msg):
     
     await msg.channel.send("<:Naret:765627711778848851>")
 
+async def repost(msg):
+    gid = msg.guild.id
+    if gid in reposts:
+        embed, time = reposts[gid]
+        elapsed = (msg.created_at - time).total_seconds()
+        if elapsed > 18000: # 5 hours
+            return await failure(msg, "last game ad was too long ago!")
+        
+        await msg.channel.send(embed=embed)
+        reposts[gid] = (embed, msg.created_at)
+    else:
+        await failure(msg, "no previous game on record.")
+
+
 reg = {"help":helpmsg, "game":game, "gamedel":gamedel, "cat":cat, "kitten":cat,\
        "dog":dog, "puppy":dog, "doggo":dog, "catto":cat, "inspire":inspire,\
-       "mayo":mayo}
+       "mayo":mayo, "repost":repost}
 
 async def failure(msg, error):
     await msg.add_reaction("❌")
