@@ -166,7 +166,7 @@ async def scribble_list(msg):
 
 reg = {"help":helpmsg, "game":game, "gamedel":gamedel, "cat":cat, "kitten":cat,\
        "dog":dog, "puppy":dog, "doggo":dog, "catto":cat, "inspire":inspire,\
-       "mayo":mayo, "scribble add":scribble_add, "scribble list":scribble_list}
+       "mayo":mayo, "scribble-add":scribble_add, "scribble-list":scribble_list}
 
 async def failure(msg, error):
     await msg.add_reaction("❌")
