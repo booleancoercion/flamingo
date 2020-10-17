@@ -1,4 +1,4 @@
-import discord, requests
+import discord, requests, json
 
 images = {"The Skeld":"https://i.imgur.com/1DrQQAC.png",
           "Mira HQ":"https://i.imgur.com/HiDaCnp.png",
@@ -133,9 +133,40 @@ async def mayo(msg):
     
     await msg.channel.send("<:Naret:765627711778848851>")
 
+async def scribble_add(msg): #Incomplete. For now it links values with just a number, the idea is to associate words with users
+    if msg.channel.id != msg.author.dm_channel.id:
+        return await failure(msg, "This command only works for direct messages")
+
+    word_list = [word.strip() for word in msg.content.split(",")]
+
+    try:
+        with open("words.json") as word_file:
+            word_dict = json.load(word_file)
+    except FileNotFoundError:
+        word_dict = {}
+
+    for word in word_list:
+        word_dict[len(word_dict) + 1] = word
+
+    with open("words.json", "w") as word_file:
+        json.dump(word_dict, word_file)
+
+async def scribble_list(msg):
+    result_msg = ""
+    if msg.channel.id != msg.author.dm_channel.id:
+        return await failure(msg, "This command only works for direct messages")
+
+    with open("words.json") as world_file:
+        word_dict = json.load(world_file)
+
+    for i in word_dict:
+        result_msg += ", " + word_dict[i]
+
+    await msg.channel.send(result_msg[2:])
+
 reg = {"help":helpmsg, "game":game, "gamedel":gamedel, "cat":cat, "kitten":cat,\
        "dog":dog, "puppy":dog, "doggo":dog, "catto":cat, "inspire":inspire,\
-       "mayo":mayo}
+       "mayo":mayo, "scribble add":scribble_add, "scribble list":scribble_list}
 
 async def failure(msg, error):
     await msg.add_reaction("❌")
