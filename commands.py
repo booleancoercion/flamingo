@@ -1,8 +1,14 @@
-import discord, requests, json
+import discord, requests, json, re
+
 
 images = {"The Skeld":"https://i.imgur.com/1DrQQAC.png",
           "Mira HQ":"https://i.imgur.com/HiDaCnp.png",
           "Polus":"https://i.imgur.com/449xJFg.png"}
+
+reposts = dict()
+settings = None
+with open("./settings.json", "r") as sfile:
+    settings = json.load(sfile)
 
 async def helpmsg(msg):
     embed = discord.Embed(title="Available commands:", description=\
@@ -10,6 +16,9 @@ async def helpmsg(msg):
 `fl!game <code> <server> [map] [imps] [confirm] [visual]` - Displays a custom formatted message according to the game info. \
 Default settings are: skeld, 2, off, off.
 `fl!gamedel` - Same as fl!game, except it deletes your own message.
+`fl!repost` - Reposts the last advertised game from this server, provided it's not too old.
+`fl!poll <emojis, no spaces> <message>` - Creates a poll in the polling channel.
+`fl!pollchannel` - Sets the polling channel. Caller must have sufficient server permissions.
 `fl!cat` - Displays a random cat picture. Only works in spam channels.
 `fl!dog` - Displays a random dog picture. Only works in spam channels.
 `fl!inspire` - Generate inspiring imagery. Only works in spam channels.
@@ -17,6 +26,24 @@ Default settings are: skeld, 2, off, off.
     
     await msg.channel.send(embed=embed)
 
+async def subreddit(msg, matches):
+    desc = "**Subreddits I found in your message:**"
+    isempty = True
+    for match in matches:
+        isempty = False
+        desc += "\n[{0}](https://reddit.com/{0})".format(match.group(1))
+    if isempty:
+        return
+
+    embed = discord.Embed(description=desc)
+    await msg.channel.send(embed=embed)
+
+reg = {"help":helpmsg}
+def command(func):
+    reg[func.__name__] = func
+    return func
+
+@command
 async def game(msg):
     msglst = msg.content.split(" ")
     if msg.content.endswith("@here"):
@@ -84,25 +111,16 @@ async def game(msg):
             icon_url=icon)
     
     await msg.channel.send(embed=embed)
+    reposts[msg.guild.id] = (embed, msg.created_at)
     return True
 
+@command
 async def gamedel(msg):
     output = await game(msg)
     if output:
         await msg.delete()
 
-async def subreddit(msg, matches):
-    desc = "**Subreddits I found in your message:**"
-    isempty = True
-    for match in matches:
-        isempty = False
-        desc += "\n[{0}](https://reddit.com/{0})".format(match.group(1))
-    if isempty:
-        return
-
-    embed = discord.Embed(description=desc)
-    await msg.channel.send(embed=embed)
-
+@command
 async def cat(msg):
     if msg.channel.name.find("spam") == -1:
         return await failure(msg, "not a spam channel.")
@@ -111,6 +129,7 @@ async def cat(msg):
     embed = discord.Embed().set_image(url=link)
     await msg.channel.send(embed=embed)
 
+@command
 async def dog(msg):
     if msg.channel.name.find("spam") == -1:
         return await failure(msg, "not a spam channel.")
@@ -118,7 +137,8 @@ async def dog(msg):
     link = r.json()["url"]
     embed = discord.Embed().set_image(url=link)
     await msg.channel.send(embed=embed)
-    
+
+@command 
 async def inspire(msg):
     if msg.channel.name.find("spam") == -1:
         return await failure(msg, "not a spam channel.")
@@ -127,12 +147,14 @@ async def inspire(msg):
     embed = discord.Embed().set_image(url=link)
     await msg.channel.send(embed=embed)
 
+@command
 async def mayo(msg):
     if msg.author.id != 311715723489705986:
         return await failure(msg, "you're not naret.")
     
     await msg.channel.send("<:Naret:765627711778848851>")
 
+@command
 async def scribble_add(msg): #Incomplete. For now it links values with just a number, the idea is to associate words with users
     if msg.channel.id != msg.author.dm_channel.id:
         return await failure(msg, "This command only works for direct messages")
@@ -151,6 +173,7 @@ async def scribble_add(msg): #Incomplete. For now it links values with just a nu
     with open("words.json", "w") as word_file:
         json.dump(word_dict, word_file)
 
+@command
 async def scribble_list(msg):
     result_msg = ""
     if msg.channel.id != msg.author.dm_channel.id:
@@ -164,9 +187,66 @@ async def scribble_list(msg):
 
     await msg.channel.send(result_msg[2:])
 
-reg = {"help":helpmsg, "game":game, "gamedel":gamedel, "cat":cat, "kitten":cat,\
-       "dog":dog, "puppy":dog, "doggo":dog, "catto":cat, "inspire":inspire,\
-       "mayo":mayo, "scribble-add":scribble_add, "scribble-list":scribble_list}
+@command
+async def repost(msg):
+    gid = msg.guild.id
+    if gid in reposts:
+        embed, time = reposts[gid]
+        elapsed = (msg.created_at - time).total_seconds()
+        if elapsed > 18000: # 5 hours
+            return await failure(msg, "last game ad was too long ago!")
+        
+        await msg.channel.send(embed=embed)
+        reposts[gid] = (embed, msg.created_at)
+    else:
+        await failure(msg, "no previous game on record.")
+
+@command
+async def pollchannel(msg):
+    gid = str(msg.guild.id)
+    perms = msg.author.guild_permissions
+    if not (perms.manage_channels or perms.manage_guild):
+        return await failure(msg, "you don't have the necessary permissions!")
+    
+    if len(msg.channel_mentions) == 0:
+        return await failure(msg, "no channel mentioned.")
+
+    if gid not in settings:
+        settings[gid] = {}
+    settings[gid]["poll_channel"] = msg.channel_mentions[0].id
+    with open("./settings.json", "r+") as sfile:
+        json.dump(settings, sfile)
+    
+    return await msg.add_reaction("✔")
+
+emoji_rgx = re.compile(r"(<:\w{2,}:\d{,20}>|[\U00002702-\U000027B0\U0001F1E0-\U0001FAFF])")
+@command 
+async def poll(msg):
+    msglst = msg.content.split(" ")
+    if len(msglst) < 3:
+        return await failure(msg, "please specify at least 2 emojies and a message.")
+    gid = str(msg.guild.id)
+    if gid not in settings:
+        return await failure(msg, "no polling channel set. Please set one using `fl!pollchannel`.")
+    channel = find_channel(msg.guild, settings[gid]["poll_channel"])
+    if channel == None:
+        return await failure(msg, "invalid channel on record. Please set a new polling channel using `fl!pollchannel`.")
+    
+    newmsg = await channel.send(" ".join(msglst[2:]))
+    emojis = msglst[1]
+    for emoji in emoji_rgx.finditer(emojis):
+        try:
+            await newmsg.add_reaction(emoji.group(1))
+        except discord.HTTPException:
+            pass
+
+
+def find_channel(guild, cid):
+    for channel in guild.text_channels:
+        if channel.id == cid:
+            return channel
+
+reg = {**reg, "kitten":cat, "puppy":dog, "doggo":dog, "catto":cat} # aliases
 
 async def failure(msg, error):
     await msg.add_reaction("❌")

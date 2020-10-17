@@ -1,7 +1,7 @@
 import discord, commands, re, asyncio
 
 client = discord.Client()
-sub_reg = re.compile(r"(?:[^A-Za-z0-9]|\A)(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
+sub_reg = re.compile(r"(?<!reddit\.com)(?:[^A-Za-z0-9]|\A)(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
 target_channel, flamingos = None, None
 
 @client.event
