@@ -1,5 +1,6 @@
 import discord, requests, json, re
 
+
 images = {"The Skeld":"https://i.imgur.com/1DrQQAC.png",
           "Mira HQ":"https://i.imgur.com/HiDaCnp.png",
           "Polus":"https://i.imgur.com/449xJFg.png"}
@@ -154,6 +155,39 @@ async def mayo(msg):
     await msg.channel.send("<:Naret:765627711778848851>")
 
 @command
+async def scribble_add(msg): #Incomplete. For now it links values with just a number, the idea is to associate words with users
+    if msg.channel.id != msg.author.dm_channel.id:
+        return await failure(msg, "This command only works for direct messages")
+
+    word_list = [word.strip() for word in msg.content.split(",")]
+
+    try:
+        with open("words.json") as word_file:
+            word_dict = json.load(word_file)
+    except FileNotFoundError:
+        word_dict = {}
+
+    for word in word_list:
+        word_dict[len(word_dict) + 1] = word
+
+    with open("words.json", "w") as word_file:
+        json.dump(word_dict, word_file)
+
+@command
+async def scribble_list(msg):
+    result_msg = ""
+    if msg.channel.id != msg.author.dm_channel.id:
+        return await failure(msg, "This command only works for direct messages")
+
+    with open("words.json") as world_file:
+        word_dict = json.load(world_file)
+
+    for i in word_dict:
+        result_msg += ", " + word_dict[i]
+
+    await msg.channel.send(result_msg[2:])
+
+@command
 async def repost(msg):
     gid = msg.guild.id
     if gid in reposts:
@@ -206,8 +240,6 @@ async def poll(msg):
         except discord.HTTPException:
             pass
 
-
-    
 
 def find_channel(guild, cid):
     for channel in guild.text_channels:
