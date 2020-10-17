@@ -10,6 +10,38 @@ settings = None
 with open("./settings.json", "r") as sfile:
     settings = json.load(sfile)
 
+async def subreddit(msg, matches):
+    desc = "**Subreddits I found in your message:**"
+    isempty = True
+    for match in matches:
+        isempty = False
+        desc += "\n[{0}](https://reddit.com/{0})".format(match.group(1))
+    if isempty:
+        return
+
+    embed = discord.Embed(description=desc)
+    await msg.channel.send(embed=embed)
+
+reg = {}
+def command(*args):
+    if callable(args[0]):
+        reg[args[0].__name__] = args[0]
+        return args[0]
+    
+    else:
+        def decorator(func):
+            for name in args:
+                if type(name) != str:
+                    raise TypeError()
+                reg[name] = func
+            return func
+        return decorator
+            
+# Syntax: if you want to add the command as is (i.e. same name as the function),
+# write @command above with nothing else. If you want to register aliases, write
+# @command(name, alias1, alias2, ...) above the function.
+
+@command("help")
 async def helpmsg(msg):
     embed = discord.Embed(title="Available commands:", description=\
 """`fl!help` - Displays this message.
@@ -25,23 +57,6 @@ Default settings are: skeld, 2, off, off.
 `fl!mayo` - naret.""")
     
     await msg.channel.send(embed=embed)
-
-async def subreddit(msg, matches):
-    desc = "**Subreddits I found in your message:**"
-    isempty = True
-    for match in matches:
-        isempty = False
-        desc += "\n[{0}](https://reddit.com/{0})".format(match.group(1))
-    if isempty:
-        return
-
-    embed = discord.Embed(description=desc)
-    await msg.channel.send(embed=embed)
-
-reg = {"help":helpmsg}
-def command(func):
-    reg[func.__name__] = func
-    return func
 
 @command
 async def game(msg):
@@ -120,7 +135,7 @@ async def gamedel(msg):
     if output:
         await msg.delete()
 
-@command
+@command("cat", "kitten", "catto", "meow")
 async def cat(msg):
     if msg.channel.name.find("spam") == -1:
         return await failure(msg, "not a spam channel.")
@@ -129,7 +144,7 @@ async def cat(msg):
     embed = discord.Embed().set_image(url=link)
     await msg.channel.send(embed=embed)
 
-@command
+@command("dog", "doggo", "puppy", "woof")
 async def dog(msg):
     if msg.channel.name.find("spam") == -1:
         return await failure(msg, "not a spam channel.")
@@ -154,9 +169,9 @@ async def mayo(msg):
     
     await msg.channel.send("<:Naret:765627711778848851>")
 
-@command
+@command("scribble-add")
 async def scribble_add(msg): #Incomplete. For now it links values with just a number, the idea is to associate words with users
-    if msg.channel.id != msg.author.dm_channel.id:
+    if msg.author.dm_channel == None or msg.channel.id != msg.author.dm_channel.id:
         return await failure(msg, "This command only works for direct messages")
 
     word_list = [word.strip() for word in msg.content.split(",")]
@@ -173,10 +188,10 @@ async def scribble_add(msg): #Incomplete. For now it links values with just a nu
     with open("words.json", "w") as word_file:
         json.dump(word_dict, word_file)
 
-@command
+@command("scribble-list")
 async def scribble_list(msg):
     result_msg = ""
-    if msg.channel.id != msg.author.dm_channel.id:
+    if msg.author.dm_channel == None or msg.channel.id != msg.author.dm_channel.id:
         return await failure(msg, "This command only works for direct messages")
 
     with open("words.json") as world_file:
@@ -245,8 +260,6 @@ def find_channel(guild, cid):
     for channel in guild.text_channels:
         if channel.id == cid:
             return channel
-
-reg = {**reg, "kitten":cat, "puppy":dog, "doggo":dog, "catto":cat} # aliases
 
 async def failure(msg, error):
     await msg.add_reaction("❌")
