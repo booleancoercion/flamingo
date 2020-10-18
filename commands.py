@@ -53,9 +53,9 @@ Default settings are: skeld, 2, off, off.
 `fl!cat` - Displays a random cat picture. Only works in spam channels.
 `fl!dog` - Displays a random dog picture. Only works in spam channels.
 `fl!inspire` - Generate inspiring imagery. Only works in spam channels.
-`fl!scribble_add <word1>, <word2>, ...` - Adds custom words to the server's scribble word list (Only works in DM)
-`fl!scribble_list` - Shows the scribble words you've added to the server's list (Only works in DM)
-`fl!scribble_remove <index>/all` - Command to remove one of your custom words. Using the `fl!scribble_list` command you 
+`fl!scribble-add <word1>, <word2>, ...` - Adds custom words to the server's scribble word list (Only works in DM)
+`fl!scribble-list` - Shows the scribble words you've added to the server's list (Only works in DM)
+`fl!scribble-remove <index>/all` - Command to remove one of your custom words. Using the `fl!scribble_list` command you 
 know what's the word's index value. Or you can use `fl!scribble_remove all` to remove all your words.
 `fl!mayo` - naret.""")
 
