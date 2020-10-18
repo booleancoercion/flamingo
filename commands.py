@@ -9,28 +9,6 @@ settings = None
 with open("./settings.json", "r") as sfile:
     settings = json.load(sfile)
 
-
-async def helpmsg(msg):
-    embed = discord.Embed(title="Available commands:", description= \
-        """`fl!help` - Displays this message.
-`fl!game <code> <server> [map] [imps] [confirm] [visual]` - Displays a custom formatted message according to the game info. \
-Default settings are: skeld, 2, off, off.
-`fl!gamedel` - Same as fl!game, except it deletes your own message.
-`fl!repost` - Reposts the last advertised game from this server, provided it's not too old.
-`fl!poll <emojis, no spaces> <message>` - Creates a poll in the polling channel.
-`fl!pollchannel` - Sets the polling channel. Caller must have sufficient server permissions.
-`fl!cat` - Displays a random cat picture. Only works in spam channels.
-`fl!dog` - Displays a random dog picture. Only works in spam channels.
-`fl!inspire` - Generate inspiring imagery. Only works in spam channels.
-`fl!scribble_add <word1>, <word2>, ...` - Adds custom words to the server's scribble word list (Only works in DM)
-`fl!scribble_list` - Shows the scribble words you've added to the server's list (Only works in DM)
-`fl!scribble_remove <index>/all` - Command to remove one of your custom words. Using the `fl!scribble_list` command you 
-know what's the word's index value. Or you can use `fl!scribble_remove all` to remove all your words.
-`fl!mayo` - naret.""")
-
-    await msg.channel.send(embed=embed)
-
-
 async def subreddit(msg, matches):
     desc = "**Subreddits I found in your message:**"
     isempty = True
@@ -43,14 +21,45 @@ async def subreddit(msg, matches):
     embed = discord.Embed(description=desc)
     await msg.channel.send(embed=embed)
 
+reg = {}
+def command(*args):
+    if callable(args[0]):
+        reg[args[0].__name__] = args[0]
+        return args[0]
+    
+    else:
+        def decorator(func):
+            for name in args:
+                if type(name) != str:
+                    raise TypeError()
+                reg[name] = func
+            return func
+        return decorator
+            
+# Syntax: if you want to add the command as is (i.e. same name as the function),
+# write @command above with nothing else. If you want to register aliases, write
+# @command(name, alias1, alias2, ...) above the function.
 
-reg = {"help": helpmsg}
+@command("help")
+async def helpmsg(msg):
+    embed = discord.Embed(title="Available commands:", description= \
+        """`fl!help` - Displays this message.
+`fl!game <code> <server> [map] [imps] [confirm] [visual]` - Displays a custom formatted message according to the game info. \
+Default settings are: skeld, 2, off, off.
+`fl!gamedel` - Same as fl!game, except it deletes your own message.
+`fl!repost` - Reposts the last advertised game from this server, provided it's not too old.
+`fl!poll <emojis, no spaces> <message>` - Creates a poll in the polling channel.
+`fl!pollchannel` - Sets the polling channel. Caller must have sufficient server permissions.
+`fl!cat` - Displays a random cat picture. Only works in spam channels.
+`fl!dog` - Displays a random dog picture. Only works in spam channels.
+`fl!inspire` - Generate inspiring imagery. Only works in spam channels.
+`fl!scribble-add <word1>, <word2>, ...` - Adds custom words to the server's scribble word list (Only works in DM)
+`fl!scribble-list` - Shows the scribble words you've added to the server's list (Only works in DM)
+`fl!scribble-remove <index>/all` - Command to remove one of your custom words. Using the `fl!scribble_list` command you 
+know what's the word's index value. Or you can use `fl!scribble_remove all` to remove all your words.
+`fl!mayo` - naret.""")
 
-
-def command(func):
-    reg[func.__name__] = func
-    return func
-
+    await msg.channel.send(embed=embed)
 
 @command
 async def game(msg):
@@ -130,8 +139,7 @@ async def gamedel(msg):
     if output:
         await msg.delete()
 
-
-@command
+@command("cat", "kitten", "catto", "meow")
 async def cat(msg):
     if msg.channel.name.find("spam") == -1:
         return await failure(msg, "not a spam channel.")
@@ -140,8 +148,7 @@ async def cat(msg):
     embed = discord.Embed().set_image(url=link)
     await msg.channel.send(embed=embed)
 
-
-@command
+@command("dog", "doggo", "puppy", "woof")
 async def dog(msg):
     if msg.channel.name.find("spam") == -1:
         return await failure(msg, "not a spam channel.")
@@ -168,10 +175,9 @@ async def mayo(msg):
 
     await msg.channel.send("<:Naret:765627711778848851>")
 
-
-@command
-async def scribble_add(msg):
-    if not isinstance(msg.channel, discord.DMChannel):
+@command("scribble-add")
+async def scribble_add(msg): #Incomplete. For now it links values with just a number, the idea is to associate words with users
+    if msg.author.dm_channel == None or msg.channel.id != msg.author.dm_channel.id:
         return await failure(msg, "This command only works for direct messages")
 
     commands = msg.content.split(" ", 1)
@@ -199,7 +205,7 @@ async def scribble_add(msg):
                                   "your word list")
 
 
-@command
+@command("scribble-list")
 async def scribble_list(msg):
     if not isinstance(msg.channel, discord.DMChannel):
         return await failure(msg, "This command only works for direct messages")
@@ -228,7 +234,7 @@ async def scribble_list(msg):
                     result_msg += ", " + world_list[user_id][i]
             result_msg = result_msg[2:]
         else:
-            return await failure(msg, "Unknown command. Try using fl!scribble_list")
+            return await failure(msg, "Unknown command. Try using fl!scribble-list")
         if len(result_msg) == 0:
             result_msg = "The list is empty"
         return await msg.channel.send(result_msg)
@@ -247,7 +253,7 @@ async def scribble_list(msg):
     return await msg.channel.send(result_msg.strip())
 
 
-@command
+@command("scribble-remove")
 async def scribble_remove(msg):
     if not isinstance(msg.channel, discord.DMChannel):
         return await failure(msg, "This command only works for direct messages")
@@ -350,8 +356,6 @@ def find_channel(guild, cid):
     for channel in guild.text_channels:
         if channel.id == cid:
             return channel
-
-reg = {**reg, "kitten": cat, "puppy": dog, "doggo": dog, "catto": cat}  # aliases
 
 async def failure(msg, error):
     await msg.add_reaction("❌")
