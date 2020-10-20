@@ -197,7 +197,7 @@ async def scribble_add(msg):
         word_list[author_id] = []
     for word in new_words:
         if word not in word_list[author_id]:
-            word_list[author_id].append(word.lower())
+            word_list[author_id].append(word.strip().lower())
 
     with open("words.json", "w") as word_file:
         json.dump(word_list, word_file)
