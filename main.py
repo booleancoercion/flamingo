@@ -15,6 +15,7 @@ async def on_ready():
             continue
         global flamingos
         flamingos = guild
+        commands.flamingo_channel = guild
         break
 
 @client.event
