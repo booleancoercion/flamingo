@@ -3,7 +3,7 @@ import discord, requests, json, re
 images = {"The Skeld": "https://i.imgur.com/1DrQQAC.png",
           "Mira HQ": "https://i.imgur.com/HiDaCnp.png",
           "Polus": "https://i.imgur.com/449xJFg.png"}
-
+flamingo_channel = None
 reposts = dict()
 settings = None
 with open("./settings.json", "r") as sfile:
@@ -176,7 +176,7 @@ async def mayo(msg):
     await msg.channel.send("<:Naret:765627711778848851>")
 
 @command("scribble-add")
-async def scribble_add(msg): #Incomplete. For now it links values with just a number, the idea is to associate words with users
+async def scribble_add(msg):
     if msg.author.dm_channel == None or msg.channel.id != msg.author.dm_channel.id:
         return await failure(msg, "This command only works for direct messages")
 
@@ -193,10 +193,11 @@ async def scribble_add(msg): #Incomplete. For now it links values with just a nu
         print(e)
         word_list = {}
 
-    if author_id in word_list:
-        word_list[author_id].extend(new_words)
-    else:
-        word_list[author_id] = new_words
+    if author_id not in word_list: #Creating an array if none exists.
+        word_list[author_id] = []
+    for word in new_words:
+        if word not in word_list[author_id]:
+            word_list[author_id].append(word.lower())
 
     with open("words.json", "w") as word_file:
         json.dump(word_list, word_file)
@@ -212,10 +213,10 @@ async def scribble_list(msg):
 
     try:
         with open("words.json") as word_file:
-            world_list = json.load(word_file)
+            word_list = json.load(word_file)
     except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
         print(e)
-        world_list = {}
+        word_list = {}
 
     author_id = str(msg.author.id)
     result_msg = ""
@@ -223,32 +224,40 @@ async def scribble_list(msg):
     commands = msg.content.split(" ")
     if len(commands) > 1:  # Looking for special keywords
         if commands[1] == "users":  # This keyword will send all the users with their word list
-            for user_id in world_list:
+            for user_id in word_list:
                 result_msg += user_id + ": "
-                for i in range(len(world_list[user_id])):
-                    result_msg += world_list[user_id][i] + ", "
+                for i in range(len(word_list[user_id])):
+                    result_msg += word_list[user_id][i] + ", "
                 result_msg = result_msg[:-2] + "\n\n"
         elif commands[1] == "full":  # This keyword just sends the list word to be used for the game
-            for user_id in world_list:
-                for i in range(len(world_list[user_id])):
-                    result_msg += ", " + world_list[user_id][i]
+            word_array = []
+            for user_id in word_list:
+                for i in range(len(word_list[user_id])):
+                    if word_list[user_id][i] not in word_array:
+                        word_array.append(word_list[user_id][i])
+            for word in word_array:
+                result_msg += ", " + word
             result_msg = result_msg[2:]
+        elif commands[1] in word_list: # Checks if a user ID was passed, and returns their list
+                result_msg += commands[1] + ":\n"
+                for i in range(len(word_list[commands[1]])):
+                    result_msg += str(i+1) + ". " + word_list[commands[1]][i] + "\n"
         else:
-            return await failure(msg, "Unknown command. Try using fl!scribble-list")
-        if len(result_msg) == 0:
+            return await failure(msg, "Oops, something went wrong. Try using fl!scribble-list instead")
+        if result_msg == "":
             result_msg = "The list is empty"
         return await msg.channel.send(result_msg)
 
-    if author_id in world_list:  # List with only the author's words
-        author_word_list = world_list[author_id]
+    if author_id in word_list:  # List with only the author's words
+        author_word_list = word_list[author_id]
+        if len(author_word_list) == 0:
+            result_msg = "Your word list is empty"
+            word_list.pop(author_id, None)
+        else:
+            for i in range(len(author_word_list)):
+                result_msg += str(i + 1) + ". " + author_word_list[i] + "\n"
     else:
-        author_word_list = []
-
-    if len(author_word_list) == 0:
         result_msg = "Your word list is empty"
-    else:
-        for i in range(len(author_word_list)):
-            result_msg += str(i + 1) + ". " + author_word_list[i] + "\n"
 
     return await msg.channel.send(result_msg.strip())
 
@@ -275,16 +284,53 @@ async def scribble_remove(msg):
     result_msg = ""
     try:
         index = int(commands[1]) - 1
-        if index < 1 or index >= len(word_list[author_id]):
+        if index < 0 or index >= len(word_list[author_id]):
             return await failure(msg, "There are no words with that index")
         removed_word = word_list[author_id].pop(index)
         if len(word_list) == 0:
             word_list.pop(author_id, None)
-        result_msg = "Done! " + removed_word + " was removed"
-    except ValueError:
+        result_msg = "Done! `" + removed_word + "` was removed"
+    except ValueError: # Valid index not found, looking for keyword/subcommand
         if commands[1] == "all":
             if word_list.pop(author_id, None) is not None:
                 result_msg = "Done! all the words in your list were removed"
+            else:
+                result_msg = "You don't have a list to remove"
+        elif commands[1].startswith("users"):
+            global flamingo_channel  # Below we verify the user is an admin of the flamingo server
+            try: # fl!scribble-remove users [user_id]/clear [index]/all
+                member = await flamingo_channel.fetch_member(msg.author.id)
+                if member.guild_permissions.administrator:
+                    sub_commands = commands[1].split(" ")
+                    if len(sub_commands) < 2:
+                        return await failure(msg, "Missing arguments")
+                    elif sub_commands[1] == "clear":
+                        word_list = {}
+                        result_msg = "All the words were removed from the list"
+                    elif sub_commands[1] not in word_list:
+                            result_msg = "User doesn't have a word list"
+                    elif len(sub_commands) < 3:
+                        return await failure(msg, "Missing argument")
+                    else:
+                        try:
+                            user_index = int(sub_commands[2]) - 1
+                            if user_index < 0 or user_index >= len(word_list[sub_commands[1]]):
+                                return await failure(msg, "User: " + sub_commands[1] + " has no words with that index")
+                            removed_word = word_list[sub_commands[1]].pop(user_index)
+                            if len(word_list) == 0:
+                                word_list.pop(sub_commands[1], None)
+                            result_msg = "Done! user: " + sub_commands[1] + "'s `" + removed_word + "` was removed"
+                        except ValueError:
+                            if sub_commands[2] == "all":
+                                word_list = {}
+                                result_msg = "All the user: " + sub_commands[1] + "'s words  were removed from the list"
+                            else:
+                                return await failure(msg, "Invalid command")
+                else:
+                    return await failure(msg, "Only Flamingo's admins can use this command")
+            except (discord.Forbidden, discord.HTTPException) as e:
+                print(e)
+                return await failure(msg, "Error: couldn't find member")
         else:
             return await failure(msg, "Please specify which word to remove with an index given by fl!scribble_list or"
                                       " clear your whole list with fl!scribble_remove all")
