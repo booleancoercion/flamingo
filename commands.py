@@ -197,7 +197,7 @@ async def scribble_add(msg):
         word_list[author_id] = []
     for word in new_words:
         if word not in word_list[author_id]:
-            word_list[author_id].append(word.lower())
+            word_list[author_id].append(word.strip().lower())
 
     with open("words.json", "w") as word_file:
         json.dump(word_list, word_file)
@@ -317,13 +317,13 @@ async def scribble_remove(msg):
                             if user_index < 0 or user_index >= len(word_list[sub_commands[1]]):
                                 return await failure(msg, "User: " + sub_commands[1] + " has no words with that index")
                             removed_word = word_list[sub_commands[1]].pop(user_index)
-                            if len(word_list) == 0:
+                            if len(word_list[sub_commands[1]]) == 0:
                                 word_list.pop(sub_commands[1], None)
                             result_msg = "Done! user: " + sub_commands[1] + "'s `" + removed_word + "` was removed"
                         except ValueError:
                             if sub_commands[2] == "all":
-                                word_list = {}
-                                result_msg = "All the user: " + sub_commands[1] + "'s words  were removed from the list"
+                                word_list.pop(sub_commands[1])
+                                result_msg = "All the user: " + sub_commands[1] + "'s words were removed from the list"
                             else:
                                 return await failure(msg, "Invalid command")
                 else:
