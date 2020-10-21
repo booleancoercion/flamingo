@@ -55,8 +55,8 @@ Default settings are: skeld, 2, off, off.
 `fl!inspire` - Generate inspiring imagery. Only works in spam channels.
 `fl!scribble-add <word1>, <word2>, ...` - Adds custom words to the server's scribble word list (Only works in DM)
 `fl!scribble-list` - Shows the scribble words you've added to the server's list (Only works in DM)
-`fl!scribble-remove <index>/all` - Command to remove one of your custom words. Using the `fl!scribble_list` command you 
-know what's the word's index value. Or you can use `fl!scribble_remove all` to remove all your words.
+`fl!scribble-remove <index>/all` - Command to remove one of your custom words. Using the `fl!scribble-list` command you 
+know what's the word's index value. Or you can use `fl!scribble-remove all` to remove all your words.
 `fl!mayo` - naret.""")
 
     await msg.channel.send(embed=embed)
