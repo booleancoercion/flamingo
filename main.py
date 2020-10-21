@@ -2,7 +2,7 @@ import discord, commands, re, asyncio
 
 client = discord.Client()
 sub_reg = re.compile(r"(?<!reddit\.com)(?:[^A-Za-z0-9]|\A)(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
-target_channel, flamingos = None, None
+target_channel, flamingos, logch = None, None, None
 
 @client.event
 async def on_ready():
@@ -10,13 +10,10 @@ async def on_ready():
     act = discord.Activity(name="fl!help", type=discord.ActivityType.listening)
     await client.change_presence(status=discord.Status.online, activity=act)
 
-    for guild in client.guilds:
-        if guild.id != 765157465528336444:
-            continue
-        global flamingos
-        flamingos = guild
-        commands.flamingo_channel = guild
-        break
+    global flamingos, logch
+    flamingos = client.get_guild(765157465528336444)
+    
+    logch = client.get_channel(768464621031653497)
 
 @client.event
 async def on_disconnect():
@@ -24,10 +21,20 @@ async def on_disconnect():
 
 @client.event
 async def on_message(msg):
+    if msg.channel.id != logch.id:
+        try:
+            if msg.channel.id != msg.author.dm_channel.id:
+                await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,\
+                                msg.channel.name, msg.guild.name) + msg.content)
+            else:
+                await logch.send("`{0}#{1}`: ".format(msg.author.name, msg.author.discriminator) + msg.content)
+        except:
+            await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,\
+                             msg.channel.name, msg.guild.name) + msg.content)
     if msg.author == client.user: # ignore the bot's messages
         return
 
-    msglst = msg.content.split(" ")
+    msglst = msg.content.lower().split(" ")
     """
     if not msglst[0].startswith("fl!"):
         return
@@ -55,6 +62,8 @@ async def on_message(msg):
                 await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference. Perhaps you meant `{1}`?".format(command, closest))
             else:
                 await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference.".format(command))
+            if msg.author.id == 346847827978223616:
+                await msg.channel.send("I expected better spelling from you, ghost")
         return
     
     matches = sub_reg.finditer(msg.content)

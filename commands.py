@@ -11,12 +11,11 @@ with open("./settings.json", "r") as sfile:
 
 async def subreddit(msg, matches):
     desc = "**Subreddits I found in your message:**"
-    isempty = True
-    for match in matches:
-        isempty = False
-        desc += "\n[{0}](https://reddit.com/{0})".format(match.group(1))
-    if isempty:
+    matches = set(map(lambda x: x.group(1), matches))
+    if len(matches) == 0:
         return
+    for match in matches:
+        desc += "\n[{0}](https://reddit.com/{0})".format(match)
 
     embed = discord.Embed(description=desc)
     await msg.channel.send(embed=embed)
