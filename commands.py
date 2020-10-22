@@ -396,12 +396,34 @@ async def poll(msg):
         except discord.HTTPException:
             pass
 
-responses = ["Maybe someday.", "Nothing.", "Neither.", "Follow the seahorse.", "I don't think so. ",\
-             "No.", "Yes.", "Try asking again."]
+conch_responses = ["Maybe someday.", "Nothing.", "Neither.", "Follow the seahorse.", "I don't think so. ",\
+                   "No.", "Yes.", "Try asking again."]
 
 @command("magic-conch")
 async def magic_conch(msg):
-    await msg.channel.send("The magic conch says: " + random.choice(responses))
+    await msg.channel.send("The magic conch says: `{0}`".format(random.choice(conch_responses)))
+
+
+pos_responses = ["As I see it, yes.", "It is certain.", "It is decidedly so.", "Most likely.", "Outlook good.",\
+                 "Signs point to yes.", "Without a doubt.", "Yes.", "Yes - definitely.", "You may rely on it."]
+
+neg_reponses = ["Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.",\
+                "Very doubtful."]
+
+may_responses = ["Ask again later.", "Better not tell you now.", "Cannot predict now.",\
+                 "Concentrate and ask again.", "Reply hazy, try again."]
+
+@command("magic8ball", "magic-8-ball", "eightball")
+def eightball(msg):
+    lst = None
+    if random.random() < 0.25:
+        lst = may_responses
+    elif hash(msg.content) % 2 == 0:
+        lst = pos_responses
+    else:
+        lst = neg_reponses
+    
+    await msg.channel.send("The magic 8 ball says: `{0}`".format(random.choice(lst)))
 
 def find_channel(guild, cid):
     for channel in guild.text_channels:
