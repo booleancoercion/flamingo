@@ -418,7 +418,7 @@ async def eightball(msg):
     lst = None
     if random.random() < 0.25:
         lst = may_responses
-    elif hash(msg.content) % 2 == 0:
+    elif (hash(msg.content) + hash(msg.author.id)) % 2 == 0:
         lst = pos_responses
     else:
         lst = neg_reponses
