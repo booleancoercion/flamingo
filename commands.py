@@ -1,4 +1,4 @@
-import discord, requests, json, re
+import discord, requests, json, re, random
 
 images = {"The Skeld": "https://i.imgur.com/1DrQQAC.png",
           "Mira HQ": "https://i.imgur.com/HiDaCnp.png",
@@ -396,6 +396,12 @@ async def poll(msg):
         except discord.HTTPException:
             pass
 
+responses = ["Maybe someday.", "Nothing.", "Neither.", "Follow the seahorse.", "I don't think so. ",\
+             "No.", "Yes.", "Try asking again."]
+
+@command("magic-conch")
+async def magic_conch(msg):
+    await msg.channel.send("The magic conch says: " + random.choice(responses))
 
 def find_channel(guild, cid):
     for channel in guild.text_channels:
