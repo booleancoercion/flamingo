@@ -414,7 +414,7 @@ may_responses = ["Ask again later.", "Better not tell you now.", "Cannot predict
                  "Concentrate and ask again.", "Reply hazy, try again."]
 
 @command("magic8ball", "magic-8-ball", "eightball")
-def eightball(msg):
+async def eightball(msg):
     lst = None
     if random.random() < 0.25:
         lst = may_responses
