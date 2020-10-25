@@ -56,7 +56,9 @@ Default settings are: skeld, 2, off, off.
 `fl!scribble-list` - Shows the scribble words you've added to the server's list (Only works in DM)
 `fl!scribble-remove <index>/all` - Command to remove one of your custom words. Using the `fl!scribble-list` command you 
 know what's the word's index value. Or you can use `fl!scribble-remove all` to remove all your words.
-`fl!mayo` - naret.""")
+`fl!mayo` - naret.
+`fl!eightball [query]` - Asks the almighty magic eight ball a yes or no question.
+`fl!magic-conch [query]` - Asks the even more powerful magic conch a question.""")
 
     await msg.channel.send(embed=embed)
 
