@@ -49,6 +49,8 @@ Default settings are: skeld, 2, off, off.
 `fl!repost` - Reposts the last advertised game from this server, provided it's not too old.
 `fl!poll <emojis, no spaces> <message>` - Creates a poll in the polling channel.
 `fl!pollchannel` - Sets the polling channel. Caller must have sufficient server permissions.
+`fl!codenames-teams <list of user @mentions>` - Separates players into red and blue teams.
+`fl!codenames-over` - Removes spy roles from everyone.
 `fl!cat` - Displays a random cat picture. Only works in spam channels.
 `fl!dog` - Displays a random dog picture. Only works in spam channels.
 `fl!inspire` - Generate inspiring imagery. Only works in spam channels.
@@ -139,6 +141,62 @@ async def gamedel(msg):
     output = await game(msg)
     if output:
         await msg.delete()
+
+def find_role(lst, role_name):
+    role_name = role_name.lower()
+    for role in lst:
+        if role.name.lower().find(role_name) != -1:
+            return role
+
+codenames_timeout = None
+
+@command("codenames-teams")
+async def codenames(msg):
+    global codenames_timeout
+    if codenames_timeout != None:
+        if (msg.created_at - codenames_timeout).total_seconds() < 60:
+            return
+    codenames_timeout = msg.created_at
+    roles = msg.guild.roles
+    red_spy = find_role(roles, "red spy")
+    blue_spy = find_role(roles, "blue spy")
+    members = msg.mentions
+    random.shuffle(members)
+
+    midpoint = len(members)//2
+    red_team = members[:midpoint]
+    blue_team = members[midpoint:]
+
+    output_red = "**Red Team:**"
+    for member in red_team:
+        if member in blue_spy.members:
+            await member.remove_roles(blue_spy, reason="Codenames teaming")
+        await member.add_roles(red_spy, reason="Codenames teaming")
+        output_red += "\n<@{}>".format(member.id)
+    
+    output_blue = "**Blue Team:**"
+    for member in blue_team:
+        if member in red_spy.members:
+            await member.remove_roles(red_spy, reason="Codenames teaming")
+        await member.add_roles(blue_spy, reason="Codenames teaming")
+        output_blue += "\n<@{}>".format(member.id)
+    
+    await msg.channel.send(output_red)
+    await msg.channel.send(output_blue)
+    
+@command("codenames-over")
+async def codenames_over(msg):
+    roles = msg.guild.roles
+    red_spy = find_role(roles, "red spy")
+    blue_spy = find_role(roles, "blue spy")
+
+    for member in red_spy.members:
+        await member.remove_roles(red_spy, reason="Codenames over")
+    
+    for member in blue_spy.members:
+        await member.remove_roles(blue_spy, reason="Codenames over")
+    
+    await msg.add_reaction("✅")
 
 @command("cat", "kitten", "catto", "meow")
 async def cat(msg):

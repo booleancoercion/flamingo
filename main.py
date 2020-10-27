@@ -1,19 +1,20 @@
 import discord, commands, re, asyncio
 
-client = discord.Client()
+intents = discord.Intents.default()
+intents.members = True
+client = discord.Client(intents=intents)
 sub_reg = re.compile(r"(?<!reddit\.com)(?:[^A-Za-z0-9]|\A)(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
 target_channel, flamingos, logch = None, None, None
 
 @client.event
 async def on_ready():
     print("Logged in as", client.user)
-    act = discord.Activity(name="fl!help", type=discord.ActivityType.listening)
-    await client.change_presence(status=discord.Status.online, activity=act)
-
     global flamingos, logch
     flamingos = client.get_guild(765157465528336444)
-    
     logch = client.get_channel(768464621031653497)
+    
+    act = discord.Activity(name="fl!help", type=discord.ActivityType.listening)
+    await client.change_presence(status=discord.Status.online, activity=act)
 
 @client.event
 async def on_disconnect():
@@ -21,16 +22,19 @@ async def on_disconnect():
 
 @client.event
 async def on_message(msg):
-    if msg.channel.id != logch.id:
+    if msg.channel.id != logch.id: # logging messages
+        content = discord.utils.escape_mentions(msg.content)
         try:
             if msg.channel.id != msg.author.dm_channel.id:
                 await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,\
-                                msg.channel.name, msg.guild.name) + msg.content)
+                                msg.channel.name, msg.guild.name) + content)
             else:
-                await logch.send("`{0}#{1}`: ".format(msg.author.name, msg.author.discriminator) + msg.content)
+                await logch.send("`{0}#{1}`: ".format(msg.author.name, msg.author.discriminator) + content)
         except:
             await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,\
-                             msg.channel.name, msg.guild.name) + msg.content)
+                             msg.channel.name, msg.guild.name) + content)
+    
+
     if msg.author == client.user: # ignore the bot's messages
         return
 
