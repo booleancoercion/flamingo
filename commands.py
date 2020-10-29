@@ -444,7 +444,7 @@ async def poll(msg):
     gid = str(msg.guild.id)
     if gid not in settings:
         return await failure(msg, "no polling channel set. Please set one using `fl!pollchannel`.")
-    channel = find_channel(msg.guild, settings[gid]["poll_channel"])
+    channel = msg.guild.get_channel(settings[gid]["poll_channel"])
     if channel == None:
         return await failure(msg, "invalid channel on record. Please set a new polling channel using `fl!pollchannel`.")
 
@@ -484,11 +484,6 @@ async def eightball(msg):
         lst = neg_reponses
     
     await msg.channel.send("The magic 8 ball says: `{0}`".format(random.choice(lst)))
-
-def find_channel(guild, cid):
-    for channel in guild.text_channels:
-        if channel.id == cid:
-            return channel
 
 async def failure(msg, error):
     await msg.add_reaction("❌")
