@@ -142,6 +142,21 @@ async def gamedel(msg):
     if output:
         await msg.delete()
 
+@command
+async def repost(msg):
+    gid = msg.guild.id
+    if gid in reposts:
+        embed, time = reposts[gid]
+        elapsed = (msg.created_at - time).total_seconds()
+        if elapsed > 18000:  # 5 hours
+            return await failure(msg, "last game ad was too long ago!")
+
+        await msg.channel.send(embed=embed)
+        reposts[gid] = (embed, msg.created_at)
+    else:
+        await failure(msg, "no previous game on record.")
+
+
 def find_role(lst, role_name):
     role_name = role_name.lower()
     for role in lst:
@@ -149,18 +164,19 @@ def find_role(lst, role_name):
             return role
 
 codenames_timeout = None
-
 @command("codenames-teams")
-async def codenames(msg):
+async def codenames(msg, members=None):
     global codenames_timeout
     if codenames_timeout != None:
         if (msg.created_at - codenames_timeout).total_seconds() < 60:
-            return
+            pass
     codenames_timeout = msg.created_at
+
     roles = msg.guild.roles
     red_spy = find_role(roles, "red spy")
     blue_spy = find_role(roles, "blue spy")
-    members = msg.mentions
+    if members == None:
+        members = msg.mentions
     random.shuffle(members)
 
     midpoint = len(members)//2
@@ -198,6 +214,18 @@ async def codenames_over(msg):
     
     await msg.add_reaction("✅")
 
+@command("codenames-shuffle")
+async def codenames_shuffle(msg):
+    roles = msg.guild.roles
+    red_spy = find_role(roles, "red spy")
+    blue_spy = find_role(roles, "blue spy")
+    members = red_spy.members + blue_spy.members
+
+    return await codenames(msg, members=members)
+
+
+
+
 @command("cat", "kitten", "catto", "meow")
 async def cat(msg):
     if msg.channel.name.find("spam") == -1:
@@ -216,7 +244,6 @@ async def dog(msg):
     embed = discord.Embed().set_image(url=link)
     await msg.channel.send(embed=embed)
 
-
 @command
 async def inspire(msg):
     if msg.channel.name.find("spam") == -1:
@@ -233,6 +260,7 @@ async def mayo(msg):
         return await failure(msg, "you're not naret.")
 
     await msg.channel.send("<:Naret:765627711778848851>")
+
 
 @command("scribble-add")
 async def scribble_add(msg):
@@ -263,7 +291,6 @@ async def scribble_add(msg):
 
     return await msg.channel.send("Your words were added, thank you. You can use fl!scribble_list to see "
                                   "your word list")
-
 
 @command("scribble-list")
 async def scribble_list(msg):
@@ -319,7 +346,6 @@ async def scribble_list(msg):
         result_msg = "Your word list is empty"
 
     return await msg.channel.send(result_msg.strip())
-
 
 @command("scribble-remove")
 async def scribble_remove(msg):
@@ -397,22 +423,6 @@ async def scribble_remove(msg):
     with open("words.json", "w") as word_file:
         json.dump(word_list, word_file)
     return await msg.channel.send(result_msg)
-
-
-@command
-async def repost(msg):
-    gid = msg.guild.id
-    if gid in reposts:
-        embed, time = reposts[gid]
-        elapsed = (msg.created_at - time).total_seconds()
-        if elapsed > 18000:  # 5 hours
-            return await failure(msg, "last game ad was too long ago!")
-
-        await msg.channel.send(embed=embed)
-        reposts[gid] = (embed, msg.created_at)
-    else:
-        await failure(msg, "no previous game on record.")
-
 
 @command
 async def pollchannel(msg):
