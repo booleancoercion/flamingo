@@ -1,84 +1,71 @@
-import discord, commands, re, asyncio
+from discord.ext import commands
+import discord
+
+import cogs.utils as utils
+
+# Cogs
+from cogs.among_us import AmongUs
+from cogs.codenames import Codenames
+from cogs.magic import Magic
+from cogs.misc import Misc
+from cogs.pictures import Pictures
+from cogs.polls import Polls
+from cogs.scribble import Scribble
+from cogs.utils import Utils
+
+cogs = [AmongUs, Codenames, Magic, Misc, Pictures, Polls, Scribble, Utils]
 
 intents = discord.Intents.default()
 intents.members = True
-client = discord.Client(intents=intents)
-sub_reg = re.compile(r"(?<!reddit\.com)(?:[^A-Za-z0-9]|\A)(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
-target_channel, flamingos, logch = None, None, None
+help_command = commands.DefaultHelpCommand()
+bot = commands.Bot(command_prefix=["fl!", "Fl!", "fL!", "FL!"], owner_id=214732126950522880, intents=intents, help_command=help_command)
+#target_channel, flamingos, logch = None, None, None
 
-@client.event
-async def on_ready():
-    print("Logged in as", client.user)
-    global flamingos, logch
-    flamingos = client.get_guild(765157465528336444)
-    logch = client.get_channel(768464621031653497)
+for Cog in cogs:
+    bot.add_cog(Cog(bot))
+
+@bot.event
+async def on_command_error(ctx, error):
+    print("encountered error: " + str(error))
+    await ctx.message.add_reaction("❌")
+
+    if type(error) == commands.CommandNotFound:
+        command = ctx.message.content.split(" ")[0][len("fl!"):]
+        if command == "channel":
+            return
+        cmds = [c.name for c in bot.commands if not c.hidden]
+
+        closest = min(cmds, key=(lambda x: utils.distance_fast(x, command)))
+        if utils.distance_fast(closest, command) < 3:
+            await ctx.send("Unknown command `{0}`. Please use fl!help for reference. Perhaps you meant `{1}`?".format(command, closest))
+        else:
+            await ctx.send("Unknown command `{0}`. Please use fl!help for reference.".format(command))
+        if ctx.author.id == 346847827978223616:
+            await ctx.send("I expected better spelling from you, ghost")
     
-    act = discord.Activity(name="fl!help", type=discord.ActivityType.listening)
-    await client.change_presence(status=discord.Status.online, activity=act)
+    elif hasattr(error, "message") and error.message != "" and error.message is not None:
+        await ctx.send("Error: " + error.message)
+    elif type(error) == commands.MissingRequiredArgument:
+        await ctx.send("Error: missing a required argument.")
+    elif type(error) == commands.UnexpectedQuoteError:
+        await ctx.send("Error: unexpected quote.")
+    elif type(error) == commands.ExpectedClosingQuoteError:
+        await ctx.send("Error: expected a closing quote, but none was found.")
+    else:
+        await ctx.send("Error: " + str(error))
 
-@client.event
+
+@bot.event
+async def on_ready():
+    print("Logged in as", bot.user)
+    act = discord.Activity(name="fl!help", type=discord.ActivityType.listening)
+    await bot.change_presence(status=discord.Status.online, activity=act)
+
+@bot.event
 async def on_disconnect():
     print("Oops! Disconnected...")
-
-@client.event
-async def on_message(msg):
-    if msg.channel.id != logch.id: # logging messages
-        content = discord.utils.escape_mentions(msg.content)
-        try:
-            if msg.channel.id != msg.author.dm_channel.id:
-                await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,\
-                                msg.channel.name, msg.guild.name) + content)
-            else:
-                await logch.send("`{0}#{1}`: ".format(msg.author.name, msg.author.discriminator) + content)
-        except:
-            await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,\
-                             msg.channel.name, msg.guild.name) + content)
-    
-
-    if msg.author == client.user: # ignore the bot's messages
-        return
-
-    msglst = msg.content.lower().split(" ")
-    """
-    if not msglst[0].startswith("fl!"):
-        return
-    """
-
-    if msglst[0].startswith("fl!"):
-        command = msglst[0][3:]
-        cmds = list(commands.reg.keys())
-        if command in cmds:
-            await commands.reg[command](msg)
-        elif command == "channel":
-            if msg.author.id != 214732126950522880:
-                return await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference.".format(command))
-
-            ch_id = int(msglst[1])
-            for channel in flamingos.text_channels:
-                if channel.id != ch_id:
-                    continue
-                global target_channel
-                target_channel = channel
-                break
-        else:
-            closest = min(cmds, key=(lambda x: commands.distance_fast(x, command)))
-            if commands.distance_fast(closest, command) < 3:
-                await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference. Perhaps you meant `{1}`?".format(command, closest))
-            else:
-                await msg.channel.send("Unknown command `{0}`. Please use fl!help for reference.".format(command))
-            if msg.author.id == 346847827978223616:
-                await msg.channel.send("I expected better spelling from you, ghost")
-        return
-    
-    matches = sub_reg.finditer(msg.content)
-    await commands.subreddit(msg, matches)
-
-    if msg.channel.id == 766265768295399424 and msg.author.id == 214732126950522880 and target_channel != None:
-        async with target_channel.typing():
-            await asyncio.sleep(0.3)
-            await target_channel.send(msg.content)
 
 tokenfile = open("./token", "r")
 token = tokenfile.readline()
 tokenfile.close()
-client.run(token)
+bot.run(token)
