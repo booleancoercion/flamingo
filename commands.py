@@ -163,6 +163,15 @@ def find_role(lst, role_name):
         if role.name.lower().find(role_name) != -1:
             return role
 
+def remove_duplicate_snowflakes(lst):
+    ids = set()
+    def func(x):
+        if x.id in ids:
+            return False
+        ids.add(x.id)
+        return True
+    return list(filter(func, lst))
+
 codenames_timeout = None
 @command("codenames-teams")
 async def codenames(msg, members=None):
@@ -175,8 +184,21 @@ async def codenames(msg, members=None):
     roles = msg.guild.roles
     red_spy = find_role(roles, "red spy")
     blue_spy = find_role(roles, "blue spy")
+
     if members == None:
-        members = msg.mentions
+        members = list()
+    
+    members.extend(msg.mentions)
+
+    first_space = msg.content.find(" ")
+    if first_space != -1:
+        names = msg.content[first_space+1:].split(",")
+        for name in names:
+            result = msg.guild.get_member_named(name.strip())
+            if result != None:
+                members.append(result)
+    
+    members = remove_duplicate_snowflakes(members)
     random.shuffle(members)
 
     midpoint = len(members)//2
@@ -494,6 +516,23 @@ async def eightball(msg):
         lst = neg_reponses
     
     await msg.channel.send("The magic 8 ball says: `{0}`".format(random.choice(lst)))
+
+
+@command
+async def selection(msg):
+    spliteroo = msg.content.split(" ")
+    if len(spliteroo) < 3:
+        return await failure(msg, "please specify a number and then a comma separated list of options")
+    
+    num = None
+    try:
+        num = int(msg.content.split(" ")[1])
+    except:
+        return await failure(msg, "please specify a valid number.")
+    
+    options = [x.strip() for x in " ".join(spliteroo[2:]).split(",")]
+    await msg.channel.send(", ".join(random.sample(options, num)))
+
 
 async def failure(msg, error):
     await msg.add_reaction("❌")
