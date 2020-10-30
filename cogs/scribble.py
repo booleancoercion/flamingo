@@ -124,6 +124,7 @@ class Scribble(commands.Cog):
 
 
     @commands.command(name="scribble-remove")
+    @commands.dm_only()
     async def scribble_remove(self, ctx):
         msg = ctx.message
 
