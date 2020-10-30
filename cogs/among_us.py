@@ -1,8 +1,8 @@
-import discord.ext.commands as commands
+from discord.ext import commands
 from discord.ext.commands import CommandError
 import discord
 
-from .utils import distance_fast
+from . import utils
 
 images = {"The Skeld": "https://i.imgur.com/1DrQQAC.png",
           "Mira HQ": "https://i.imgur.com/HiDaCnp.png",
@@ -37,11 +37,11 @@ class AmongUs(commands.Cog):
 
         # Format the map
         mapname = mapname.lower()
-        if distance_fast(mapname, "skeld") < 3 or mapname == "s":
+        if utils.distance_fast(mapname, "skeld") < 3 or mapname == "s":
             mapname = "The Skeld"
-        elif distance_fast(mapname, "mira") < 3 or mapname == "m":
+        elif utils.distance_fast(mapname, "mira") < 3 or mapname == "m":
             mapname = "Mira HQ"
-        elif distance_fast(mapname, "polus") < 3 or mapname == "p":
+        elif utils.distance_fast(mapname, "polus") < 3 or mapname == "p":
             mapname = "Polus"
         else:
             raise CommandError("invalid map name: " + mapname)
@@ -80,8 +80,8 @@ class AmongUs(commands.Cog):
         return True
     
     @commands.command()
-    async def gamedel(self, ctx, *args):
-        output = await self.game(ctx, *args)
+    async def gamedel(self, ctx, code, server, *args):
+        output = await self.game(ctx, code, server, *args)
         if output:
             await ctx.message.delete()
     

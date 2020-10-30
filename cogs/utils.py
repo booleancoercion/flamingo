@@ -1,11 +1,12 @@
-import discord, re, asyncio
 from discord.ext import commands
+import discord, re, asyncio
 
 SUB_REG = re.compile(r"(?<!reddit\.com)(?:[^A-Za-z0-9]|\A)(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
 
 class Utils(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.target_channel = None
     
     @commands.Cog.listener(name="on_message")
     async def logger(self, msg):
@@ -13,15 +14,13 @@ class Utils(commands.Cog):
 
         if msg.channel.id != logch.id:
             content = discord.utils.escape_mentions(msg.content)
-            try:
-                if msg.channel.id != msg.author.dm_channel.id:
-                    await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,\
-                                    msg.channel.name, msg.guild.name) + content)
-                else:
-                    await logch.send("`{0}#{1}`: ".format(msg.author.name, msg.author.discriminator) + content)
-            except:
+
+            if type(msg.channel) != discord.DMChannel:
                 await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,\
                                 msg.channel.name, msg.guild.name) + content)
+            else:
+                await logch.send("`{0}#{1}`: ".format(msg.author.name, msg.author.discriminator) + content)
+
     
     @commands.Cog.listener(name="on_message")
     async def subreddits(self, msg):
@@ -38,9 +37,28 @@ class Utils(commands.Cog):
 
         embed = discord.Embed(description=desc)
         await msg.channel.send(embed=embed)
+    
+    @commands.Cog.listener(name="on_message")
+    async def botsay(self, msg):
+        if msg.channel.id == 766265768295399424 and msg.author.id == 214732126950522880 and self.target_channel is not None:
+            async with self.target_channel.typing():
+                await asyncio.sleep(0.3)
+                await self.target_channel.send(msg.content)
+    
+    @commands.command(hidden=True)
+    async def channel(self, ctx, ch_id: int):
+        if ctx.author.id != 214732126950522880:
+            return await ctx.send("Unknown command `{0}`. Please use fl!help for reference.".format(ctx.command.name))
 
-    @commands.command(name="help")
-    async def helpmsg(ctx):
+        flamingos = self.bot.get_guild(765157465528336444)
+        for channel in flamingos.text_channels:
+            if channel.id != ch_id:
+                continue
+            self.target_channel = channel
+            break
+
+    #@commands.command(name="help")
+    async def helpmsg(self, ctx):
         embed = discord.Embed(title="Available commands:", description= \
         """`fl!help` - Displays this message.
 `fl!game <code> <server> [map] [imps] [confirm] [visual]` - Displays a custom formatted message according to the game info. \
