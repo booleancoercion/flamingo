@@ -18,7 +18,7 @@ class AmongUs(commands.Cog):
         msg = ctx.message
 
         if len(code) != 6:
-            raise CommandError("invalid game code(1): " + code)
+            raise CommandError(message="invalid game code(1): " + code)
         if not set(code.lower()).issubset(set("abcdefghijklmnopqrstuvwxyz")):
             raise CommandError("invalid game code(2): " + code)
 
@@ -103,4 +103,3 @@ class AmongUs(commands.Cog):
             raise CommandError("no previous game on record.")
     
 
-    
