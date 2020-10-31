@@ -28,7 +28,7 @@ class Magic(commands.Cog):
         lst = None
         if random.random() < 0.25:
             lst = MAYBE
-        elif (hash(msg.content) + hash(msg.author.id)) % 2 == 0:
+        elif hash(msg.content + str(msg.author.id)) % 2 == 0:
             lst = POSITIVE
         else:
             lst = NEGATIVE
