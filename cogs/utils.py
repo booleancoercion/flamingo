@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord, re, asyncio
 
 SUB_REG = re.compile(r"(?<!reddit\.com)(?:[^A-Za-z0-9]|\A)(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
+BOTSAY_ALLOWED = [214732126950522880, 642071692037980212]
 
 class Utils(commands.Cog):
     def __init__(self, bot):
@@ -40,14 +41,14 @@ class Utils(commands.Cog):
     
     @commands.Cog.listener(name="on_message")
     async def botsay(self, msg):
-        if msg.channel.id == 766265768295399424 and msg.author.id == 214732126950522880 and self.target_channel is not None:
+        if msg.channel.id == 766265768295399424 and msg.author.id in BOTSAY_ALLOWED and self.target_channel is not None:
             async with self.target_channel.typing():
                 await asyncio.sleep(0.3)
                 await self.target_channel.send(msg.content)
     
     @commands.command(hidden=True)
     async def channel(self, ctx, ch_id: int):
-        if ctx.author.id != 214732126950522880:
+        if ctx.author.id not in BOTSAY_ALLOWED:
             return await ctx.send("Unknown command `{0}`. Please use fl!help for reference.".format(ctx.command.name))
 
         flamingos = self.bot.get_guild(765157465528336444)
