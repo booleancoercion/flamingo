@@ -5,14 +5,16 @@ class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command()
+    @commands.command(brief="Naret.", help="Naret.")
     async def mayo(self, ctx):
         if ctx.author.id != 311715723489705986:
             raise commands.CommandError("you're not naret.")
 
         await ctx.send("<:Naret:765627711778848851>")
 
-    @commands.command()
+    @commands.command(usage="<num> <list... separated by commas>",
+        brief="Makes selections from a given list",
+        help="Makes a specified number of selections from a given list. Selections do not repeat.")
     async def selection(self, ctx):
         msg = ctx.message
 

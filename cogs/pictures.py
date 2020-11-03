@@ -8,7 +8,9 @@ class Pictures(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command(name="cat", aliases=["kitten", "catto", "meow"])
+    @commands.command(name="cat", aliases=["kitten", "catto", "meow"],
+        brief="Displays a random cat picture.",
+        help="Displays a random cat picture. Only works in spam channels.")
     async def cat(self, ctx):
         if not is_spam_channel(ctx.channel):
             raise commands.CommandError("not a spam channel.")
@@ -17,7 +19,9 @@ class Pictures(commands.Cog):
         embed = discord.Embed().set_image(url=link)
         await ctx.send(embed=embed)
 
-    @commands.command(name="dog", aliases=["doggo", "puppy", "woof"])
+    @commands.command(name="dog", aliases=["doggo", "puppy", "woof"],
+        brief="Displays a random dog picture.",
+        help="Displays a random dog picture. Only works in spam channels.")
     async def dog(self, ctx):
         if not is_spam_channel(ctx.channel):
             raise commands.CommandError("not a spam channel.")
@@ -26,7 +30,8 @@ class Pictures(commands.Cog):
         embed = discord.Embed().set_image(url=link)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(brief="Generate inspiring imagery.",
+        help="Generate inspiring imagery. Only works in spam channels.")
     async def inspire(self, ctx):
         if not is_spam_channel(ctx.channel):
             raise commands.CommandError("not a spam channel.")

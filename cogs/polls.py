@@ -9,14 +9,15 @@ class Polls(commands.Cog):
         with open("./settings.json", "r") as sfile:
             self.settings = json.load(sfile)
     
-    @commands.command()
+    @commands.command(usage="<#channel>", brief="Sets the server's polling channel.",
+    help="Sets the server's polling channel to be used with fl!poll. You must have\
+the manage channels permission to use this command.")
+    @commands.has_permissions(manage_channels=True)
+    @commands.guild_only()
     async def pollchannel(self, ctx):
         msg = ctx.message
 
         gid = str(msg.guild.id)
-        perms = msg.author.guild_permissions
-        if not (perms.manage_channels or perms.manage_guild):
-            raise commands.CommandError("you don't have the necessary permissions!")
 
         if len(msg.channel_mentions) == 0:
             raise commands.CommandError("no channel mentioned.")
@@ -29,13 +30,14 @@ class Polls(commands.Cog):
 
         return await msg.add_reaction("✔")
 
-    @commands.command()
-    async def poll(self, ctx):
+    @commands.command(usage="<emojis> <message...>", brief="Creates a new poll.",
+    help="Creates a new poll in the server's polling channel, with the given emojis as\
+pre-added reactions. Both default emojis and server emojis are allowed.")
+    @commands.guild_only()
+    async def poll(self, ctx, emojis):
         msg = ctx.message
 
         msglst = msg.content.split(" ")
-        if len(msglst) < 3:
-            raise commands.CommandError("please specify at least 2 emojies and a message.")
         gid = str(msg.guild.id)
         if gid not in self.settings:
             raise commands.CommandError("no polling channel set. Please set one using `fl!pollchannel`.")
@@ -44,7 +46,6 @@ class Polls(commands.Cog):
             raise commands.CommandError("invalid channel on record. Please set a new polling channel using `fl!pollchannel`.")
 
         newmsg = await channel.send(" ".join(msglst[2:]))
-        emojis = msglst[1]
         for emoji in EMOJI_REGEX.finditer(emojis):
             try:
                 await newmsg.add_reaction(emoji.group(1))

@@ -17,11 +17,17 @@ class Magic(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command("magic-conch")
+    @commands.command("magic-conch", brief="Asks the all powerful magic conch a question.",
+        help="Asks the all powerful magic conch a yes or no question. ~~For less annoying answers, \
+try fl!eightball~~", usage="<query>")
     async def magic_conch(self, ctx):
         await ctx.send("The magic conch says: `{0}`".format(random.choice(CONCH)))
 
-    @commands.command(name="eightball", aliases=["magic8ball", "magic-8-ball"])
+    @commands.command(name="eightball", aliases=["magic8ball", "magic-8-ball"],
+        usage="<query>",
+        brief="Asks the almighty magic eight ball a question.",
+        help="Asks the almighty magic eight ball a yes or no question. Answers are deterministic \
+(at least, consistent between bot reboots)")
     async def eightball(self, ctx):
         msg = ctx.message
 

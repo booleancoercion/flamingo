@@ -21,13 +21,13 @@ class Scribble(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command(name="scribble-add")
+    @commands.command(name="scribble-add",
+        usage="<words... separated by commas>",
+        brief="Adds words to the scribble list",
+        help="Adds custom words to the server's scribble word list (DM Only)")
     @commands.dm_only()
     async def scribble_add(self, ctx):
         msg = ctx.message
-
-        if msg.author.dm_channel is None or msg.channel.id != msg.author.dm_channel.id:
-            raise commands.CommandError("this command only works for direct messages")
 
         cmds = msg.content.split(" ", 1)
         if len(cmds) < 2:
@@ -50,7 +50,10 @@ class Scribble(commands.Cog):
         return await ctx.send("Your words were added, thank you. You can use fl!scribble-list to see "
                                     "your word list")
 
-    @commands.group(name="scribble-list", invoke_without_subcommand=True)
+    @commands.group(name="scribble-list", invoke_without_subcommand=True,
+        usage="",
+        brief="Shows the scribble words you've added.",
+        help="Shows the scribble words you've added to the server's list (DM Only)")
     @commands.dm_only()
     async def scribble_list(self, ctx, second=None):
         for command in eval("self.scribble_list.commands"): # to suppress the wrong error......
@@ -58,9 +61,6 @@ class Scribble(commands.Cog):
                 return await command(ctx)
 
         msg = ctx.message
-
-        if not isinstance(msg.channel, discord.DMChannel):
-            raise commands.CommandError("this command only works for direct messages")
 
         word_list = get_word_list()
 
@@ -92,8 +92,8 @@ class Scribble(commands.Cog):
 
         return await ctx.send(result_msg.strip())
 
-    @scribble_list.command()
-    async def users(self, ctx):
+    @scribble_list.command(name="users", hidden=True)
+    async def scibble_list_users(self, ctx):
         word_list = get_word_list()
         
         result_msg = ""
@@ -105,7 +105,7 @@ class Scribble(commands.Cog):
         
         await ctx.send(result_msg.strip()) # TODO: make this send in chunks
     
-    @scribble_list.command(name="full")
+    @scribble_list.command(name="full", hidden=True)
     async def scribble_list_full(self, ctx):
         word_list = get_word_list()
         word_array = []
@@ -123,7 +123,10 @@ class Scribble(commands.Cog):
         
 
 
-    @commands.command(name="scribble-remove")
+    @commands.command(name="scribble-remove", usage="<index|'all'>",
+        brief="Remove some of your custom words.",
+        help="Removes one of your custom words. Using the `fl!scribble-list` command you \
+know what word maps to what index, or you can use the `all` option to remove all of your words.")
     @commands.dm_only()
     async def scribble_remove(self, ctx):
         msg = ctx.message

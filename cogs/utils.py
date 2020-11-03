@@ -60,24 +60,7 @@ class Utils(commands.Cog):
     #@commands.command(name="help")
     async def helpmsg(self, ctx):
         embed = discord.Embed(title="Available commands:", description= \
-        """`fl!help` - Displays this message.
-`fl!game <code> <server> [map] [imps] [confirm] [visual]` - Displays a custom formatted message according to the game info. \
-Default settings are: skeld, 2, off, off.
-`fl!gamedel` - Same as fl!game, except it deletes your own message.
-`fl!repost` - Reposts the last advertised game from this server, provided it's not too old.
-`fl!poll <emojis, no spaces> <message>` - Creates a poll in the polling channel.
-`fl!pollchannel` - Sets the polling channel. Caller must have sufficient server permissions.
-`fl!codenames-teams <list of user @mentions>` - Separates players into red and blue teams.
-`fl!codenames-over` - Removes spy roles from everyone.
-`fl!cat` - Displays a random cat picture. Only works in spam channels.
-`fl!dog` - Displays a random dog picture. Only works in spam channels.
-`fl!inspire` - Generate inspiring imagery. Only works in spam channels.
-`fl!scribble-add <word1>, <word2>, ...` - Adds custom words to the server's scribble word list (Only works in DM)
-`fl!scribble-list` - Shows the scribble words you've added to the server's list (Only works in DM)
-`fl!scribble-remove <index>/all` - Command to remove one of your custom words. Using the `fl!scribble-list` command you 
-know what's the word's index value. Or you can use `fl!scribble-remove all` to remove all your words.
-`fl!mayo` - naret.
-`fl!eightball [query]` - Asks the almighty magic eight ball a yes or no question.
+"""`fl!eightball [query]` - Asks the almighty magic eight ball a yes or no question.
 `fl!magic-conch [query]` - Asks the even more powerful magic conch a question.""")
 
         await ctx.send(embed=embed)

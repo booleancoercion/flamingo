@@ -13,7 +13,9 @@ class AmongUs(commands.Cog):
         self.bot = bot
         self.reposts = dict()
     
-    @commands.command()
+    @commands.command(brief="Formats game info.",
+    help="Displays a custom formatted message according to the game info.\n\
+Note that the code and server are always required.")
     async def game(self, ctx, code, server, mapname="skeld", imps=2, confirm="off", visual="off"):
         msg = ctx.message
 
@@ -79,13 +81,18 @@ class AmongUs(commands.Cog):
         self.reposts[msg.guild.id] = (embed, msg.created_at)
         return True
     
-    @commands.command()
+    @commands.command(usage="<code> <server> [mapname=skeld] [imps=2] [confirm=off] [visual=off]",
+    brief="Formats game info and deletes your msg.",
+    help="Displays a custom formatted message according to the game info, then deletes\
+your own message.\nNote that the code and server are always required.")
     async def gamedel(self, ctx, code, server, *args):
         output = await self.game(ctx, code, server, *args)
         if output:
             await ctx.message.delete()
     
-    @commands.command()
+    @commands.command(aliases=["repeat"], brief="Repeats the last formatted game.",
+    help="Repeats the last formatted/repeated game sent on this server. This will not work\
+if the last message is more than 5 hours old.")
     async def repost(self, ctx):
         msg = ctx.message
 

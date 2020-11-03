@@ -18,8 +18,13 @@ cogs = [AmongUs, Codenames, Magic, Misc, Pictures, Polls, Scribble, Utils]
 intents = discord.Intents.default()
 intents.members = True
 help_command = commands.DefaultHelpCommand()
-bot = commands.Bot(command_prefix=["fl!", "Fl!", "fL!", "FL!"], owner_id=214732126950522880, intents=intents, help_command=help_command)
-#target_channel, flamingos, logch = None, None, None
+
+bot = commands.Bot(
+    command_prefix=["fl!", "Fl!", "fL!", "FL!"],
+    owner_id=214732126950522880,
+    intents=intents,
+    help_command=help_command
+)
 
 for Cog in cogs:
     bot.add_cog(Cog(bot))
