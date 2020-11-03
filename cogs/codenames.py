@@ -22,8 +22,8 @@ class Codenames(commands.Cog):
         self.codenames_timeout = None
     
     @commands.command(name="codenames-teams", usage="<user @mentions or names>",
-    brief="Starts a new game of codenames.", help="Starts a new game of codenames in the current server.\
-The server must have roles named 'blue spy' and 'red spy' (case insensitive). Users are taken from the message,\
+    brief="Starts a new game of codenames.", help="Starts a new game of codenames in the current server. \
+The server must have roles named 'blue spy' and 'red spy' (case insensitive). Users are taken from the message, \
 either via @mention or EXACTLY the same username/nick.")
     @commands.guild_only()
     async def codenames(self, ctx, members=None):
@@ -76,7 +76,7 @@ either via @mention or EXACTLY the same username/nick.")
         await ctx.send(output_blue)
         
     @commands.command(name="codenames-over", brief="Ends the current session of codenames.",
-    help="Ends the current session of codenames. Will remove the roles 'red spy' and 'blue spy' from\
+    help="Ends the current session of codenames. Will remove the roles 'red spy' and 'blue spy' from \
 anyone in the server.")
     @commands.guild_only()
     async def codenames_over(self, ctx):
@@ -95,7 +95,7 @@ anyone in the server.")
         await msg.add_reaction("✅")
 
     @commands.command(name="codenames-shuffle", brief="Suffles the teams in codenames.",
-    help="Shuffles the teams in the current session of codenames. This will shuffle anyone with the red or\
+    help="Shuffles the teams in the current session of codenames. This will shuffle anyone with the red or \
 blue spy roles, and then act like codenames-teams.")
     @commands.guild_only()
     async def codenames_shuffle(self, ctx):
