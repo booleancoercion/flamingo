@@ -29,4 +29,19 @@ class Misc(commands.Cog):
             raise commands.CommandError("please specify a valid number.")
         
         options = [x.strip() for x in " ".join(spliteroo[2:]).split(",")]
-        await ctx.send(", ".join(random.sample(options, num)))
+        choices = ", ".join(random.sample(options, num))
+        embed = discord.Embed(
+            title="Selected {0} out of {1} options:".format(
+                num,
+                len(options)
+            ),
+            description=choices
+        )
+        embed.set_footer(
+            text="{0}#{1} | Yes liv, I'm a party pooper.".format(
+                ctx.author.name,
+                ctx.author.discriminator
+            ),
+            icon_url=ctx.author.avatar_url
+        )
+        await ctx.send(embed=embed)
