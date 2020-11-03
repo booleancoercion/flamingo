@@ -70,7 +70,7 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
 
         result = sum(random.choices(range(1, die+1), k=num))
 
-        await ctx.send("Rolled a {0}: `{1}`".format(roll, result))
+        await ctx.send("Rolled {0}: `{1}`".format(roll, result))
 
 def distance_fast(s1, s2):
     memory = {}
