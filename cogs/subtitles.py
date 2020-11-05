@@ -11,7 +11,7 @@ class Subtitles(commands.Cog):
             return
         
         subtitles = []
-        words = msg.content.translate(None, string.punctuation).lower().split(" ")
+        words = msg.content.translate(str.maketrans('', '', string.punctuation)).lower().split(" ")
         content = msg.content.lower()
 
         if "owt" in words:
