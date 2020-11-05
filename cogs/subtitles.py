@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord
+import discord, string
 
 class Subtitles(commands.Cog):
     def __init__(self, bot):
@@ -11,16 +11,18 @@ class Subtitles(commands.Cog):
             return
         
         subtitles = []
-        words = msg.content.split(" ")
+        words = msg.content.translate(None, string.punctuation).lower().split(" ")
+        content = msg.content.lower()
+
         if "owt" in words:
             subtitles.append("owt = anything")
-        elif "twat" in words:
-            subtitles.append("twat = really fucking annoying")
-        elif "wanker" in words:
+        if "twat" in words:
+            subtitles.append("twat = just stupid")
+        if "wanker" in words:
             subtitles.append("wanker = idiot or fool")
-        elif "nip out" in msg.content:
+        if "nip out" in content or "nipping out" in content:
             subtitles.append("nip out = going out")
-        elif "tapped" in words:
+        if "tapped" in words:
             subtitles.append("tapped = crazy and/or insane")
         
         if len(subtitles) > 0:
