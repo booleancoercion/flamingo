@@ -10,7 +10,7 @@ class Polls(commands.Cog):
             self.settings = json.load(sfile)
     
     @commands.command(usage="<#channel>", brief="Sets the server's polling channel.",
-    help="Sets the server's polling channel to be used with fl!poll. You must have\
+    help="Sets the server's polling channel to be used with fl!poll. You must have \
 the manage channels permission to use this command.")
     @commands.has_permissions(manage_channels=True)
     @commands.guild_only()
@@ -31,7 +31,7 @@ the manage channels permission to use this command.")
         return await msg.add_reaction("✔")
 
     @commands.command(usage="<emojis> <message...>", brief="Creates a new poll.",
-    help="Creates a new poll in the server's polling channel, with the given emojis as\
+    help="Creates a new poll in the server's polling channel, with the given emojis as \
 pre-added reactions. Both default emojis and server emojis are allowed.")
     @commands.guild_only()
     async def poll(self, ctx, emojis):
