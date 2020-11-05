@@ -11,9 +11,10 @@ from cogs.misc import Misc
 from cogs.pictures import Pictures
 from cogs.polls import Polls
 from cogs.scribble import Scribble
+from cogs.subtitles import Subtitles
 from cogs.utils import Utils
 
-cogs = [AmongUs, Codenames, Magic, Misc, Pictures, Polls, Scribble, Utils]
+cogs = [AmongUs, Codenames, Magic, Misc, Pictures, Polls, Scribble, Subtitles, Utils]
 
 intents = discord.Intents.default()
 intents.members = True

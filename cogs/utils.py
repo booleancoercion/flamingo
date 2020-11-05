@@ -24,7 +24,7 @@ class Utils(commands.Cog):
 
     
     @commands.Cog.listener(name="on_message")
-    async def subreddits(self, msg):
+    async def subreddits(self, msg): # if this is changed, consider ignoring the bot
         if msg.content.startswith("fl!"):
             return
         matches = SUB_REG.finditer(msg.content)
