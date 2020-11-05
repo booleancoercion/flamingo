@@ -10,10 +10,18 @@ class Subtitles(commands.Cog):
         if msg.author.bot or msg.content.startswith("fl!"):
             return
         
-        subtitle = ""
+        subtitles = []
         words = msg.content.split(" ")
         if "owt" in words:
-            subtitle = "owt = anything"
+            subtitles.append("owt = anything")
+        elif "twat" in words:
+            subtitles.append("twat = really fucking annoying")
+        elif "wanker" in words:
+            subtitles.append("wanker = idiot or fool")
+        elif "nip out" in msg.content:
+            subtitles.append("nip out = going out")
+        elif "tapped" in words:
+            subtitles.append("tapped = crazy and/or insane")
         
-        if len(subtitle) > 0:
-            await msg.channel.send("```css\n[{0}]\n```".format(subtitle))
+        if len(subtitles) > 0:
+            await msg.channel.send("```css\n[{0}]\n```".format("]\n[".join(subtitles)))
