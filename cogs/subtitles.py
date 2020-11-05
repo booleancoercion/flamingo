@@ -2,12 +2,12 @@ from discord.ext import commands
 import discord
 
 class Subtitles(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot):
         self.bot = bot
     
     @commands.Cog.listener(name="on_message")
     async def subtitles(self, msg: discord.Message):
-        if msg.author.id == self.bot.id or msg.content.startswith("fl!"):
+        if msg.author.bot or msg.content.startswith("fl!"):
             return
         
         subtitle = ""
