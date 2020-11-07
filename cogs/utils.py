@@ -57,20 +57,6 @@ class Utils(commands.Cog):
                 continue
             self.target_channel = channel
             break
-    
-    @commands.command(brief="Rolls dice.", help="Rolls dice, given in D&D notation. \
-For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
-    async def roll(self, ctx, roll: str = "1d6"):
-        sploot = roll.split("d")
-        if len(sploot) != 2:
-            raise commands.CommandError("Invalid input.")
-        
-        num = int(sploot[0])
-        die = int(sploot[1])
-
-        result = sum(random.choices(range(1, die+1), k=num))
-
-        await ctx.send("Rolled {0}: `{1}`".format(roll, result))
 
 def distance_fast(s1, s2):
     memory = {}

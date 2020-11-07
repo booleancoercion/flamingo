@@ -27,6 +27,9 @@ class Misc(commands.Cog):
             num = int(msg.content.split(" ")[1])
         except:
             raise commands.CommandError("please specify a valid number.")
+            
+        if num > 1000:
+            raise commands.CommandError("Number too high.")
         
         options = [x.strip() for x in " ".join(spliteroo[2:]).split(",")]
         choices = ", ".join(random.sample(options, num))
@@ -45,3 +48,20 @@ class Misc(commands.Cog):
             icon_url=ctx.author.avatar_url
         )
         await ctx.send(embed=embed)
+    
+    @commands.command(brief="Rolls dice.", help="Rolls dice, given in D&D notation. \
+For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
+    async def roll(self, ctx, roll: str = "1d6"):
+        sploot = roll.split("d")
+        if len(sploot) != 2:
+            raise commands.CommandError("Invalid input.")
+        
+        num = int(sploot[0])
+        die = int(sploot[1])
+
+        if num > 1000 or die > 1000:
+            raise commands.CommandError("Numbers too high.")
+
+        result = sum(random.choices(range(1, die+1), k=num))
+
+        await ctx.send("Rolled {0}: `{1}`".format(roll, result))
