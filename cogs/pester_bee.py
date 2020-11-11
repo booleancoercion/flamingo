@@ -17,4 +17,6 @@ class PesterBee(commands.Cog):
                 await msg.channel.send("<@648864666780696576> go study <:duckstab:766230691209674752>")
             
             if self.beecounter % 2 == 0:
+                if msg.author.dm_channel is None:
+                    msg.author.dm_channel = msg.author.create_dm()
                 await msg.author.dm_channel.send("GO STUDY https://i.imgur.com/F2TqFCb.jpg")
