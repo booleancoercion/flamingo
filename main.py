@@ -16,6 +16,10 @@ from cogs.utils import Utils
 
 cogs = [AmongUs, Codenames, Magic, Misc, Pictures, Polls, Scribble, Subtitles, Utils]
 
+if True: # to be togglable
+    from cogs.pester_bee import PesterBee
+    cogs.append(PesterBee)
+
 intents = discord.Intents.default()
 intents.members = True
 help_command = commands.DefaultHelpCommand()
