@@ -14,4 +14,4 @@ class PesterBee(commands.Cog):
         
         if self.beecounter >= 10:
             self.beecounter = 0
-            await msg.channel.send("<@648864666780696576> go study <:duckstab:776182283304173628>")
+            await msg.channel.send("<@648864666780696576> go study <:duckstab:766230691209674752>")
