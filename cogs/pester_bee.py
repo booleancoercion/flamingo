@@ -18,5 +18,5 @@ class PesterBee(commands.Cog):
             
             if self.beecounter % 2 == 0:
                 if msg.author.dm_channel is None:
-                    msg.author.dm_channel = msg.author.create_dm()
+                    msg.author.dm_channel = await msg.author.create_dm()
                 await msg.author.dm_channel.send("GO STUDY https://i.imgur.com/F2TqFCb.jpg")
