@@ -1,6 +1,11 @@
 from discord.ext import commands
 import discord, random
 
+MSG_LIMIT = 10_000
+BESTOF_ID = 775000958110400572
+BESTOF_PREDICT_ID = 779752031551356948
+
+
 class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -65,3 +70,112 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
         result = sum(random.choices(range(1, die+1), k=num))
 
         await ctx.send("Rolled {0}: `{1}`".format(roll, result))
+    
+    @commands.command()
+    @commands.is_owner()
+    async def analyze(self, ctx):
+        channel = ctx.message.channel_mentions[0]
+        counters = dict()
+
+        a_msg = await ctx.send(
+            "Analyzing the last (at most) {0:,} messages in <#{1}>: 0 read".format(MSG_LIMIT, channel.id)
+        )
+
+        i = 0
+        async for msg in channel.history(limit=MSG_LIMIT):
+            if i % (MSG_LIMIT//25) == 0:
+                await a_msg.edit(
+                    content="Analyzing the last (at most) {0:,} messages in <#{1}>: {2:,} read".format(
+                        MSG_LIMIT,
+                        channel.id,
+                        i
+                    )
+                )
+            
+            id = msg.author.id
+            if id not in counters:
+                counters[id] = 0
+            counters[id] += 1
+
+            i += 1
+        
+        leaderboard = list(map(lambda x: (x, counters[x]), counters))
+        leaderboard.sort(key=lambda x: x[1], reverse=True)
+
+        s = i
+        
+        content = "Top 10 message senders in <#{0}> according to the last (at most) {1:,} messages:\n"\
+            .format(channel.id, MSG_LIMIT)
+        for i, u in enumerate(leaderboard):
+            if i >= 10:
+                break
+
+            content += "{0}. <@{1}>: {2:,} messages. ({3:,.2f}%)\n".format(
+                i+1,
+                u[0],
+                u[1],
+                100*u[1]/s
+            )
+        
+        embed = discord.Embed()
+        embed.description = content
+
+        await a_msg.delete()
+        await ctx.send(embed=embed)
+    
+
+    @commands.Cog.listener(name="on_raw_reaction_add")
+    async def starboard(self, payload):
+        channel = self.bot.get_channel(payload.channel_id)
+        msg = await channel.fetch_message(payload.message_id)
+        reaction = None
+
+        for r in msg.reactions:
+            if r.emoji == "⭐":
+                reaction = r
+                break
+        else:
+            return
+
+        if reaction.count < 1:
+            return
+        elif (msg.channel.id == BESTOF_ID or msg.channel.id == BESTOF_PREDICT_ID) and msg.author.id == self.bot.user.id:
+            return
+        
+        async for user in reaction.users():
+            if user.id == self.bot.user.id:
+                return
+        
+        await msg.add_reaction("⭐")
+
+        embed = discord.Embed()
+        if msg.author.id == 728859615898632193: # predictabot
+            prediction = msg.embeds[0]
+            embed.set_author(
+                name=prediction.author.name,
+                url=msg.jump_url,
+                icon_url=prediction.author.icon_url
+            ).set_footer(
+                text="This is a prediction from PredictaBot!",
+                icon_url=msg.author.avatar_url
+            )
+            embed.description = prediction.description
+
+            bestof = self.bot.get_channel(BESTOF_PREDICT_ID) # best of predictabot
+            await bestof.send(embed=embed)
+        else:
+            embed.set_author(
+                name=msg.author.name,
+                url=msg.jump_url,
+                icon_url=msg.author.avatar_url
+            ).set_footer(
+                text="Originally posted in #{0}".format(msg.channel.name)
+            )
+            if len(msg.attachments) > 0:
+                embed.set_image(
+                    url=msg.attachments[0].url
+                )
+            embed.description = msg.content
+
+            bestof = self.bot.get_channel(BESTOF_ID) # best of flamingo
+            await bestof.send(embed=embed)

@@ -16,12 +16,13 @@ from cogs.utils import Utils
 
 cogs = [AmongUs, Codenames, Magic, Misc, Pictures, Polls, Scribble, Subtitles, Utils]
 
-if True: # to be togglable
+if False: # to be togglable
     from cogs.pester_bee import PesterBee
     cogs.append(PesterBee)
 
 intents = discord.Intents.default()
 intents.members = True
+intents.reactions = True
 help_command = commands.DefaultHelpCommand()
 
 bot = commands.Bot(

@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord, re, asyncio, random
+import discord, re, asyncio
 
 SUB_REG = re.compile(r"(?<!reddit\.com)(?:[^A-Za-z0-9]|\A)(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
 BOTSAY_ALLOWED = [214732126950522880, 642071692037980212]
@@ -14,7 +14,7 @@ class Utils(commands.Cog):
         logch = self.bot.get_channel(768464621031653497)
 
         if msg.channel.id != logch.id:
-            content = discord.utils.escape_mentions(msg.content)
+            content = msg.clean_content
 
             if type(msg.channel) != discord.DMChannel:
                 await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,\
