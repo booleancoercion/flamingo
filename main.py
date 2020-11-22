@@ -37,7 +37,7 @@ for Cog in cogs:
 
 @bot.event
 async def on_command_error(ctx, error):
-    print("encountered error: " + str(error))
+    print("encountered error({}): {}".format(type(error), str(error)))
     await ctx.message.add_reaction("❌")
 
     if type(error) == commands.CommandNotFound:
@@ -62,12 +62,19 @@ async def on_command_error(ctx, error):
         await ctx.send("Error: unexpected quote.")
     elif type(error) == commands.ExpectedClosingQuoteError:
         await ctx.send("Error: expected a closing quote, but none was found.")
+    elif type(error) == commands.CheckFailure and str(error).find("global"):
+        await ctx.send("You've been banned from using this bot.")
     else:
         await ctx.send("Error: " + str(error))
 
-banlist_file = open("./banned.txt", "r")
-banned_ids = set(banlist_file.readline().split(","))
-banlist_file.close()
+banned_ids = set()
+
+try:
+    banlist_file = open("./banned.txt", "r")
+    banned_ids = set(banlist_file.readline().split(","))
+    banlist_file.close()
+except:
+    pass
 
 @bot.check
 def check_banned(ctx):
