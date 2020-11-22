@@ -79,7 +79,9 @@ except:
 @bot.check
 def check_banned(ctx):
     if str(ctx.author.id) in banned_ids:
+        print(banned_ids)
         raise commands.CommandError("You've been banned from using this bot.")
+    return True
 
 
 @bot.event
