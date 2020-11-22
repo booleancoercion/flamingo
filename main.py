@@ -71,7 +71,7 @@ banned_ids = set()
 
 try:
     banlist_file = open("./banned.txt", "r")
-    banned_ids = set(banlist_file.readline().split(","))
+    banned_ids = set(banlist_file.readlines())
     banlist_file.close()
 except:
     pass
