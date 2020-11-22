@@ -65,6 +65,15 @@ async def on_command_error(ctx, error):
     else:
         await ctx.send("Error: " + str(error))
 
+banlist_file = open("./banned.txt", "r")
+banned_ids = set(banlist_file.readline().split(","))
+banlist_file.close()
+
+@bot.check
+def check_banned(ctx):
+    if str(ctx.author.id) in banned_ids:
+        raise commands.CommandError("You've been banned from using this bot.")
+
 
 @bot.event
 async def on_ready():
