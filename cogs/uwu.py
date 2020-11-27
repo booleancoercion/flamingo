@@ -41,7 +41,7 @@ class UwU(commands.Cog):
     
     @commands.Cog.listener(name="on_message")
     async def uwuify(self, msg):
-        if msg.author.id == self.bot.user.id or len(msg.content) < 20:
+        if msg.author.id == self.bot.user.id or len(msg.content) < 10:
             return
 
         if random.random() < 0.0005: # about every 2000 messages
