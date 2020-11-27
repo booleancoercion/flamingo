@@ -13,8 +13,9 @@ from cogs.polls import Polls
 from cogs.scribble import Scribble
 from cogs.subtitles import Subtitles
 from cogs.utils import Utils
+from cogs.uwu import UwU
 
-cogs = [AmongUs, Codenames, Magic, Misc, Pictures, Polls, Scribble, Subtitles, Utils]
+cogs = [AmongUs, Codenames, Magic, Misc, Pictures, Polls, Scribble, Subtitles, Utils, UwU]
 
 if False: # to be togglable
     from cogs.pester_bee import PesterBee
