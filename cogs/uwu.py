@@ -44,6 +44,6 @@ class UwU(commands.Cog):
         if msg.author.id == self.bot.user.id or len(msg.content) < 10:
             return
 
-        if random.random() < 0.0005: # about every 2000 messages
+        if random.random() < 0.002: # about every 2000 messages
             await msg.channel.send(UwU.convert_sentence(msg.content))
 
