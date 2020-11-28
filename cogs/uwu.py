@@ -8,6 +8,7 @@ class UwU(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
+    @staticmethod
     def convert_word(word): # Taken from https://github.com/WahidBawa/UwU-Translator
         converted = ""
         doubleT = doubleT_Presence = th_Presence = False
@@ -31,6 +32,7 @@ class UwU(commands.Cog):
         else:
             return word
     
+    @staticmethod
     def convert_sentence(string):
         words = string.split(' ')
         output = ""
