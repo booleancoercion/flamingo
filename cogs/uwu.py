@@ -1,8 +1,13 @@
 from discord.ext import commands
-import discord, random
+import random
 from random import randint as rand
 
-alphabet = list("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+ALPHABET = list("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+
+PICK_LIST = [
+    419153182095179796, # bitter
+    541045275310030848, # abby
+]
 
 class UwU(commands.Cog):
     def __init__(self, bot):
@@ -28,7 +33,7 @@ class UwU(commands.Cog):
             else:
                 converted += word[i]
         if len(word) > 0 and (word[0] != ":" or word[-1] != ":"):
-            return ((converted[0] + "-" + converted[0:]) if (rand(1, 10) == 1 and converted[0] in alphabet) else converted)
+            return ((converted[0] + "-" + converted[0:]) if (rand(1, 10) == 1 and converted[0] in ALPHABET) else converted)
         else:
             return word
     
@@ -46,6 +51,11 @@ class UwU(commands.Cog):
         if msg.author.id == self.bot.user.id or len(msg.content) < 10:
             return
 
-        if random.random() < 0.002: # about every 2000 messages
+        if msg.author.id in PICK_LIST:
+            if random.random() < 0.005: # about every 200 messages:
+                converted = UwU.convert_sentence(msg.content)
+                if converted != msg.content:
+                    await msg.channel.send(converted)
+        if random.random() < 0.001: # about every 1000 messages
             await msg.channel.send(UwU.convert_sentence(msg.content))
 
