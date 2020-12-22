@@ -57,5 +57,7 @@ class UwU(commands.Cog):
                 if converted != msg.content:
                     await msg.channel.send(converted)
         if random.random() < 0.001: # about every 1000 messages
-            await msg.channel.send(UwU.convert_sentence(msg.content))
+            converted = UwU.convert_sentence(msg.content)
+            if converted != msg.content:
+                await msg.channel.send(converted)
 
