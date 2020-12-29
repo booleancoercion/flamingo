@@ -1,8 +1,13 @@
 from discord.ext import commands
-import discord, random
+import random
 from random import randint as rand
 
-alphabet = list("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+ALPHABET = list("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+
+PICK_LIST = [
+    419153182095179796, # bitter
+    541045275310030848, # abby
+]
 
 class UwU(commands.Cog):
     def __init__(self, bot):
@@ -28,7 +33,7 @@ class UwU(commands.Cog):
             else:
                 converted += word[i]
         if len(word) > 0 and (word[0] != ":" or word[-1] != ":"):
-            return ((converted[0] + "-" + converted[0:]) if (rand(1, 10) == 1 and converted[0] in alphabet) else converted)
+            return ((converted[0] + "-" + converted[0:]) if (rand(1, 10) == 1 and converted[0] in ALPHABET) else converted)
         else:
             return word
     
@@ -40,4 +45,3 @@ class UwU(commands.Cog):
             output += UwU.convert_word(word) + " "
         
         return output[:-1] # strip the last space
-
