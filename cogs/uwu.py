@@ -40,12 +40,4 @@ class UwU(commands.Cog):
             output += UwU.convert_word(word) + " "
         
         return output[:-1] # strip the last space
-    
-    @commands.Cog.listener(name="on_message")
-    async def uwuify(self, msg):
-        if msg.author.id == self.bot.user.id or len(msg.content) < 10:
-            return
-
-        if random.random() < 0.002: # about every 2000 messages
-            await msg.channel.send(UwU.convert_sentence(msg.content))
 
