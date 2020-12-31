@@ -4,16 +4,16 @@ import discord
 import cogs.utils as utils
 
 # Cogs
-from cogs.among_us import AmongUs
+from cogs.among_us  import AmongUs
 from cogs.codenames import Codenames
-from cogs.magic import Magic
-from cogs.misc import Misc
-from cogs.pictures import Pictures
-from cogs.polls import Polls
-from cogs.scribble import Scribble
+from cogs.magic     import Magic
+from cogs.misc      import Misc
+from cogs.pictures  import Pictures
+from cogs.polls     import Polls
+from cogs.scribble  import Scribble
 from cogs.subtitles import Subtitles
-from cogs.utils import Utils
-from cogs.uwu import UwU
+from cogs.utils     import Utils
+from cogs.uwu       import UwU
 
 cogs = [AmongUs, Codenames, Magic, Misc, Pictures, Polls, Scribble, Subtitles, Utils, UwU]
 
