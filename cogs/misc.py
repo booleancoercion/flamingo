@@ -182,5 +182,5 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
     @commands.Cog.listener(name="on_message")
     async def stop_bool_mayo(self, msg: discord.Message):
         c = msg.content.lower()
-        if ("bool" in c or "bewl" in c or "bol" in c) and ("mayo" in c or "moya" in c or "meyo" in c):# and msg.author.id == 716584088030543972:
+        if ("bool" in c or "bewl" in c or "bol" in c) and ("mayo" in c or "moya" in c or "meyo" in c) and msg.author.id == 716584088030543972:
             await msg.delete()
