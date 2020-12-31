@@ -5,7 +5,6 @@ MSG_LIMIT = 10_000
 BESTOF_ID = 775000958110400572
 BESTOF_PREDICT_ID = 779752031551356948
 
-
 class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -179,3 +178,9 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
 
             bestof = self.bot.get_channel(BESTOF_ID) # best of flamingo
             await bestof.send(embed=embed)
+    
+    @commands.Cog.listener(name="on_message")
+    async def stop_bool_mayo(self, msg: discord.Message):
+        c = msg.content.lower()
+        if ("bool" in c or "bewl" in c or "bol" in c) and ("mayo" in c or "moya" in c or "meyo" in c):# and msg.author.id == 716584088030543972:
+            await msg.delete()
