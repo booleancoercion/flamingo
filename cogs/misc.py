@@ -197,4 +197,4 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
         if len(word_set) == 1 and "echo" in word_set:
             echo_count = len(words)
             new_content = "<:NotLikeThis:806903084542197811>" * echo_count
-            msg.channel.send(new_content)
+            await msg.channel.send(new_content)
