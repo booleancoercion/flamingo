@@ -1,4 +1,5 @@
-import discord, asyncio
+import discord
+import asyncio
 
 client = discord.Client()
 tokenfile = open("./token", "r")
@@ -8,6 +9,7 @@ tokenfile.close()
 loop = asyncio.get_event_loop()
 
 channel = None
+
 
 @client.event
 async def on_ready():
@@ -23,7 +25,8 @@ async def on_ready():
                 if channel is None:
                     print("Invalid channel.")
                 else:
-                    print("Set channel to #{0} in guild {1}".format(channel.name, channel.guild.name))
+                    print("Set channel to #{0} in guild {1}".format(
+                        channel.name, channel.guild.name))
             elif command == "stop":
                 await client.logout()
                 break

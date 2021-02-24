@@ -1,5 +1,6 @@
 from discord.ext import commands
-import discord, json
+import discord
+import json
 
 
 def get_word_list():
@@ -9,8 +10,9 @@ def get_word_list():
     except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
         print(e)
         word_list = {}
-    
+
     return word_list
+
 
 def save_word_list(word_list):
     with open("words.json", "w") as word_file:
@@ -20,11 +22,11 @@ def save_word_list(word_list):
 class Scribble(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     @commands.command(name="scribble-add",
-        usage="<words... separated by commas>",
-        brief="Adds words to the scribble list",
-        help="Adds custom words to the server's scribble word list (DM Only)")
+                      usage="<words... separated by commas>",
+                      brief="Adds words to the scribble list",
+                      help="Adds custom words to the server's scribble word list (DM Only)")
     @commands.dm_only()
     async def scribble_add(self, ctx):
         msg = ctx.message
@@ -37,9 +39,9 @@ class Scribble(commands.Cog):
 
         word_list = get_word_list()
 
-        if author_id not in word_list: #Creating an array if none exists.
+        if author_id not in word_list:  # Creating an array if none exists.
             word_list[author_id] = []
-        
+
         for word in new_words:
             word = word.strip().lower()
             if word not in word_list[author_id]:
@@ -48,15 +50,16 @@ class Scribble(commands.Cog):
         save_word_list(word_list)
 
         return await ctx.send("Your words were added, thank you. You can use fl!scribble-list to see "
-                                    "your word list")
+                              "your word list")
 
     @commands.group(name="scribble-list", invoke_without_subcommand=True,
-        usage="",
-        brief="Shows the scribble words you've added.",
-        help="Shows the scribble words you've added to the server's list (DM Only)")
+                    usage="",
+                    brief="Shows the scribble words you've added.",
+                    help="Shows the scribble words you've added to the server's list (DM Only)")
     @commands.dm_only()
     async def scribble_list(self, ctx, second=None):
-        for command in eval("self.scribble_list.commands"): # to suppress the wrong error......
+        # to suppress the wrong error......
+        for command in eval("self.scribble_list.commands"):
             if command.name == second:
                 return await command(ctx)
 
@@ -68,13 +71,14 @@ class Scribble(commands.Cog):
         result_msg = ""
 
         if second is not None:
-            if second in word_list: # Checks if a user ID was passed, and returns their list
+            if second in word_list:  # Checks if a user ID was passed, and returns their list
                 result_msg += second + ":\n"
                 for i in range(len(word_list[second])):
                     result_msg += str(i+1) + ". " + word_list[second][i] + "\n"
-            
+
             else:
-                raise commands.CommandError("something went wrong. Try using `fl!scribble-list` instead")
+                raise commands.CommandError(
+                    "something went wrong. Try using `fl!scribble-list` instead")
 
             result_msg = result_msg if result_msg != "" else "The list is empty"
             return await ctx.send(result_msg)
@@ -86,7 +90,8 @@ class Scribble(commands.Cog):
                 word_list.pop(author_id, None)
             else:
                 for i in range(len(author_word_list)):
-                    result_msg += str(i + 1) + ". " + author_word_list[i] + "\n"
+                    result_msg += str(i + 1) + ". " + \
+                        author_word_list[i] + "\n"
         else:
             result_msg = "Your word list is empty"
 
@@ -95,16 +100,16 @@ class Scribble(commands.Cog):
     @scribble_list.command(name="users", hidden=True)
     async def scibble_list_users(self, ctx):
         word_list = get_word_list()
-        
+
         result_msg = ""
         for user_id in word_list:
             result_msg += user_id + ": "
             for i in range(len(word_list[user_id])):
                 result_msg += word_list[user_id][i] + ", "
             result_msg = result_msg[:-2] + "\n\n"
-        
-        await ctx.send(result_msg.strip()) # TODO: make this send in chunks
-    
+
+        await ctx.send(result_msg.strip())  # TODO: make this send in chunks
+
     @scribble_list.command(name="full", hidden=True)
     async def scribble_list_full(self, ctx):
         word_list = get_word_list()
@@ -119,20 +124,19 @@ class Scribble(commands.Cog):
             result_msg += ", " + word
         result_msg = result_msg[2:]
 
-        await ctx.send(result_msg.strip()) # TODO: make this send in chunks
-        
-
+        await ctx.send(result_msg.strip())  # TODO: make this send in chunks
 
     @commands.command(name="scribble-remove", usage="<index|'all'>",
-        brief="Remove some of your custom words.",
-        help="Removes one of your custom words. Using the `fl!scribble-list` command you \
+                      brief="Remove some of your custom words.",
+                      help="Removes one of your custom words. Using the `fl!scribble-list` command you \
 know what word maps to what index, or you can use the `all` option to remove all of your words.")
     @commands.dm_only()
     async def scribble_remove(self, ctx):
         msg = ctx.message
 
         if not isinstance(msg.channel, discord.DMChannel):
-            raise commands.CommandError("This command only works for direct messages")
+            raise commands.CommandError(
+                "This command only works for direct messages")
 
         word_list = get_word_list()
 
@@ -147,21 +151,23 @@ know what word maps to what index, or you can use the `all` option to remove all
         if author_id in word_list:
             index = int(cmds[1]) - 1
             if index < 0 or index >= len(word_list[author_id]):
-                raise commands.CommandError("there are no words with that index")
+                raise commands.CommandError(
+                    "there are no words with that index")
             removed_word = word_list[author_id].pop(index)
             if len(word_list) == 0:
                 word_list.pop(author_id, None)
             result_msg = "Done! `" + removed_word + "` was removed"
-        
-        else: # Valid index not found, looking for keyword/subcommand
+
+        else:  # Valid index not found, looking for keyword/subcommand
             if cmds[1] == "all":
                 if word_list.pop(author_id, None) is not None:
                     result_msg = "Done! all the words in your list were removed"
                 else:
                     result_msg = "You don't have a list to remove"
             elif cmds[1].startswith("users"):
-                flamingos = self.bot.get_guild(765157465528336444)  # Below we verify the user is an admin of the flamingo server
-                try: # fl!scribble-remove users [user_id]/clear [index]/all
+                # Below we verify the user is an admin of the flamingo server
+                flamingos = self.bot.get_guild(765157465528336444)
+                try:  # fl!scribble-remove users [user_id]/clear [index]/all
                     member = flamingos.get_member(msg.author.id)
                     if member.guild_permissions.administrator:
                         sub_commands = cmds[1].split(" ")
@@ -171,32 +177,40 @@ know what word maps to what index, or you can use the `all` option to remove all
                             word_list = {}
                             result_msg = "All the words were removed from the list"
                         elif sub_commands[1] not in word_list:
-                                result_msg = "User doesn't have a word list"
+                            result_msg = "User doesn't have a word list"
                         elif len(sub_commands) < 3:
                             raise commands.CommandError("missing argument")
                         else:
                             try:
                                 user_index = int(sub_commands[2]) - 1
                                 if user_index < 0 or user_index >= len(word_list[sub_commands[1]]):
-                                    raise commands.CommandError("User: " + sub_commands[1] + " has no words with that index")
-                                removed_word = word_list[sub_commands[1]].pop(user_index)
+                                    raise commands.CommandError(
+                                        "User: " + sub_commands[1] + " has no words with that index")
+                                removed_word = word_list[sub_commands[1]].pop(
+                                    user_index)
                                 if len(word_list[sub_commands[1]]) == 0:
                                     word_list.pop(sub_commands[1], None)
-                                result_msg = "Done! user: " + sub_commands[1] + "'s `" + removed_word + "` was removed"
+                                result_msg = "Done! user: " + \
+                                    sub_commands[1] + "'s `" + \
+                                    removed_word + "` was removed"
                             except ValueError:
                                 if sub_commands[2] == "all":
                                     word_list.pop(sub_commands[1])
-                                    result_msg = "All the user: " + sub_commands[1] + "'s words were removed from the list"
+                                    result_msg = "All the user: " + \
+                                        sub_commands[1] + \
+                                        "'s words were removed from the list"
                                 else:
-                                    raise commands.CommandError("invalid command")
+                                    raise commands.CommandError(
+                                        "invalid command")
                     else:
-                        raise commands.CommandError("only Flamingo's admins can use this command")
+                        raise commands.CommandError(
+                            "only Flamingo's admins can use this command")
                 except (discord.Forbidden, discord.HTTPException) as e:
                     print(e)
                     raise commands.CommandError("couldn't find member")
             else:
                 raise commands.CommandError("please specify which word to remove with an index given by fl!scribble-list or"
-                                        " clear your whole list with fl!scribble-remove all")
+                                            " clear your whole list with fl!scribble-remove all")
 
         save_word_list(word_list)
         return await ctx.send(result_msg)

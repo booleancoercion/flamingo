@@ -8,13 +8,14 @@ images = {"The Skeld": "https://i.imgur.com/1DrQQAC.png",
           "Mira HQ": "https://i.imgur.com/HiDaCnp.png",
           "Polus": "https://i.imgur.com/449xJFg.png"}
 
+
 class AmongUs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.reposts = dict()
-    
+
     @commands.command(brief="Formats game info.",
-    help="Displays a custom formatted message according to the game info.\n\
+                      help="Displays a custom formatted message according to the game info.\n\
 Note that the code and server are always required.")
     async def game(self, ctx, code, server, mapname="skeld", imps=2, confirm="off", visual="off"):
         msg = ctx.message
@@ -26,10 +27,10 @@ Note that the code and server are always required.")
 
         # Format the server
         server = server.lower()
-        if server in ["na", "america", "northamerica", "north", "murica", "freedom", "freedomland", "guns", \
-                    "rootytootypointandshooty", "an", "ns", "nq", "nz", "ma", "ba", "ja", "boba"]:
+        if server in ["na", "america", "northamerica", "north", "murica", "freedom", "freedomland", "guns",
+                      "rootytootypointandshooty", "an", "ns", "nq", "nz", "ma", "ba", "ja", "boba"]:
             server = "North America"
-        elif server in ["eu", "europe", "eur", "euro", "baguettes", "pasta", "impasta", "sweden", "italy", "ue", \
+        elif server in ["eu", "europe", "eur", "euro", "baguettes", "pasta", "impasta", "sweden", "italy", "ue",
                         "germany", "france", "tea", "norway", "buttertea", "wu", "ru", "du", "ei", "ey", "ej", "nimrob"]:
             server = "Europe"
         elif server in ["as", "asia", "nobodyusesthisserver", "rice", "oranges", "sa"]:
@@ -74,24 +75,24 @@ Note that the code and server are always required.")
         embed = discord.Embed(title="{0} - {1}".format(code.upper(), server)) \
             .add_field(name="Confirm Ejects", value=confirm) \
             .add_field(name="Visual Tasks", value=visual) \
-            .set_author(name="{0} | {1} Impostor{2}".format(mapname, imps, "" if imps == 1 else "s"), \
+            .set_author(name="{0} | {1} Impostor{2}".format(mapname, imps, "" if imps == 1 else "s"),
                         icon_url=icon)
 
         await ctx.send(embed=embed)
         self.reposts[msg.guild.id] = (embed, msg.created_at)
         return True
-    
+
     @commands.command(usage="<code> <server> [mapname=skeld] [imps=2] [confirm=off] [visual=off]",
-    brief="Formats game info and deletes your msg.",
-    help="Displays a custom formatted message according to the game info, then deletes\
+                      brief="Formats game info and deletes your msg.",
+                      help="Displays a custom formatted message according to the game info, then deletes\
 your own message.\nNote that the code and server are always required.")
     async def gamedel(self, ctx, code, server, *args):
         output = await self.game(ctx, code, server, *args)
         if output:
             await ctx.message.delete()
-    
+
     @commands.command(aliases=["repeat"], brief="Repeats the last formatted game.",
-    help="Repeats the last formatted/repeated game sent on this server. This will not work\
+                      help="Repeats the last formatted/repeated game sent on this server. This will not work\
 if the last message is more than 5 hours old.")
     async def repost(self, ctx):
         msg = ctx.message
@@ -108,5 +109,3 @@ if the last message is more than 5 hours old.")
             self.reposts[gid] = (embed, msg.created_at)
         else:
             raise CommandError("no previous game on record.")
-    
-
