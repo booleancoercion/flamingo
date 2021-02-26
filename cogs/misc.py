@@ -11,13 +11,6 @@ class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(brief="Naret.", help="Naret.")
-    async def mayo(self, ctx):
-        if ctx.author.id != 311715723489705986:
-            raise commands.CommandError("you're not naret.")
-
-        await ctx.send("<:Naret:765627711778848851>")
-
     @commands.command(usage="<num> <list... separated by commas>",
                       brief="Makes selections from a given list",
                       help="Makes a specified number of selections from a given list. Selections do not repeat.")
@@ -129,7 +122,7 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
     @commands.Cog.listener(name="on_raw_reaction_add")
     async def starboard(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
-        msg = await channel.fetch_message(payload.message_id)
+        msg: discord.Message = await channel.fetch_message(payload.message_id)
         reaction = None
 
         for r in msg.reactions:
@@ -151,6 +144,10 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
         await msg.add_reaction("⭐")
 
         embed = discord.Embed()
+        embed.add_field(
+            name="Source",
+            value="[Jump!]({0})".format(msg.jump_url)
+        )
         if msg.author.id == 728859615898632193:  # predictabot
             prediction = msg.embeds[0]
             embed.set_author(
