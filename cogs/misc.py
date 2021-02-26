@@ -152,7 +152,6 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
             prediction = msg.embeds[0]
             embed.set_author(
                 name=prediction.author.name,
-                url=msg.jump_url,
                 icon_url=prediction.author.icon_url
             ).set_footer(
                 text="This is a prediction from PredictaBot!",
@@ -166,7 +165,6 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
         else:
             embed.set_author(
                 name=msg.author.name,
-                url=msg.jump_url,
                 icon_url=msg.author.avatar_url
             ).set_footer(
                 text="Originally posted in #{0}".format(msg.channel.name)
