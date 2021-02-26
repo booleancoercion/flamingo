@@ -1,10 +1,15 @@
 from discord.ext import commands
 import discord
 import random
+import requests
 
 MSG_LIMIT = 10_000
 BESTOF_ID = 775000958110400572
 BESTOF_PREDICT_ID = 779752031551356948
+
+
+def is_spam_channel(ch):
+    return type(ch) == discord.DMChannel or ch.name.find("spam") != -1
 
 
 class Misc(commands.Cog):
@@ -65,6 +70,14 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
         result = sum(random.choices(range(1, die+1), k=num))
 
         await ctx.send("Rolled {0}: `{1}`".format(roll, result))
+
+    @commands.command(brief="Fun facts.", help="Retrieves a random fun fact from the internet.")
+    async def funfact(self, ctx):
+        if not is_spam_channel(ctx.channel):
+            raise commands.CommandError("not a spam channel.")
+        r = requests.get("https://api.fungenerators.com/fact/random")
+        text = r.json()["contents"]["fact"]
+        await ctx.send("Fun Fact: {0}".format(text))
 
     @commands.command()
     @commands.is_owner()

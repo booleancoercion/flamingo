@@ -19,8 +19,7 @@ class Pictures(commands.Cog):
             raise commands.CommandError("not a spam channel.")
         r = requests.get("http://aws.random.cat/meow")
         link = r.json()["file"]
-        embed = discord.Embed().set_image(url=link)
-        await ctx.send(embed=embed)
+        await ctx.send(link)
 
     @commands.command(name="dog", aliases=["doggo", "puppy", "woof"],
                       brief="Displays a random dog picture.",
@@ -31,8 +30,7 @@ class Pictures(commands.Cog):
         r = requests.get(
             "https://random.dog/woof.json?include=jpg,jpeg,png,gif")
         link = r.json()["url"]
-        embed = discord.Embed().set_image(url=link)
-        await ctx.send(embed=embed)
+        await ctx.send(link)
 
     @commands.command(brief="Generate inspiring imagery.",
                       help="Generate inspiring imagery. Only works in spam channels.")
@@ -41,5 +39,4 @@ class Pictures(commands.Cog):
             raise commands.CommandError("not a spam channel.")
         r = requests.get("https://inspirobot.me/api?generate=true")
         link = r.text
-        embed = discord.Embed().set_image(url=link)
-        await ctx.send(embed=embed)
+        await ctx.send(link)
