@@ -75,8 +75,9 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
     async def funfact(self, ctx):
         if not is_spam_channel(ctx.channel):
             raise commands.CommandError("not a spam channel.")
-        r = requests.get("https://api.fungenerators.com/fact/random")
-        text = r.json()["contents"]["fact"]
+        r = requests.get(
+            "https://uselessfacts.jsph.pl/random.json?language=en")
+        text = r.json()["text"]
         await ctx.send("Fun Fact: {0}".format(text))
 
     @commands.command()
