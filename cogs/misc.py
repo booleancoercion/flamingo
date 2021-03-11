@@ -212,4 +212,7 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
     async def poker(self, msg: discord.Message):
         c: str = msg.content
         if c.startswith("👀"):
-            await msg.add_reaction("✌️")
+            if msg.author.id == 214732126950522880:  # me
+                await msg.add_reaction("🛡️")
+            else:
+                await msg.add_reaction("✌️")
