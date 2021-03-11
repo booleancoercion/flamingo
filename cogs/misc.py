@@ -207,3 +207,9 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
             echo_count = len(words)
             new_content = "<:NotLikeThis:806903084542197811>" * echo_count
             await msg.channel.send(new_content)
+
+    @commands.Cog.listener(name="on_message")
+    async def poker(self, msg: discord.Message):
+        c: str = msg.content
+        if c.startswith("👀"):
+            await msg.add_reaction("✌️")
