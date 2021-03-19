@@ -1,14 +1,18 @@
 from discord.ext import commands
-import discord, re, asyncio
+import discord
+import re
+import asyncio
 
-SUB_REG = re.compile(r"(?<!reddit\.com)(?:[^A-Za-z0-9]|\A)(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
+SUB_REG = re.compile(
+    r"(?<!reddit\.com)(?:[^A-Za-z0-9]|\A)(r\/[A-Za-z0-9][A-Za-z0-9_]{2,20})(?:[^A-Za-z0-9]|\Z)")
 BOTSAY_ALLOWED = [214732126950522880, 642071692037980212]
+
 
 class Utils(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.target_channel = None
-    
+
     @commands.Cog.listener(name="on_message")
     async def logger(self, msg):
         logch = self.bot.get_channel(768464621031653497)
@@ -17,14 +21,13 @@ class Utils(commands.Cog):
             content = msg.clean_content
 
             if type(msg.channel) != discord.DMChannel:
-                await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,\
-                                msg.channel.name, msg.guild.name) + content)
+                await logch.send("`{0}#{1} -> #{2} ({3})`: ".format(msg.author.name, msg.author.discriminator,
+                                                                    msg.channel.name, msg.guild.name) + content)
             else:
                 await logch.send("`{0}#{1}`: ".format(msg.author.name, msg.author.discriminator) + content)
 
-    
     @commands.Cog.listener(name="on_message")
-    async def subreddits(self, msg): # if this is changed, consider ignoring the bot
+    async def subreddits(self, msg):  # if this is changed, consider ignoring the bot
         if msg.content.startswith("fl!"):
             return
         matches = SUB_REG.finditer(msg.content)
@@ -38,14 +41,14 @@ class Utils(commands.Cog):
 
         embed = discord.Embed(description=desc)
         await msg.channel.send(embed=embed)
-    
+
     @commands.Cog.listener(name="on_message")
     async def botsay(self, msg):
         if msg.channel.id == 766265768295399424 and msg.author.id in BOTSAY_ALLOWED and self.target_channel is not None:
             async with self.target_channel.typing():
                 await asyncio.sleep(0.3)
                 await self.target_channel.send(msg.content)
-    
+
     @commands.command(hidden=True)
     async def channel(self, ctx, ch_id: int):
         if ctx.author.id not in BOTSAY_ALLOWED:
@@ -58,9 +61,11 @@ class Utils(commands.Cog):
             self.target_channel = channel
             break
 
+
 def distance_fast(s1, s2):
     memory = {}
     return distance_mem(s1, s2, 0, 0, memory)
+
 
 def distance_mem(s1, s2, a, b, memory):
     if (a, b) not in memory:

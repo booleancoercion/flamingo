@@ -1,5 +1,7 @@
 from discord.ext import commands
-import discord, random
+import discord
+import random
+
 
 def find_role(lst, role_name):
     role_name = role_name.lower()
@@ -7,8 +9,10 @@ def find_role(lst, role_name):
         if role.name.lower().find(role_name) != -1:
             return role
 
+
 def remove_duplicate_snowflakes(lst):
     ids = set()
+
     def func(x):
         if x.id in ids:
             return False
@@ -16,13 +20,14 @@ def remove_duplicate_snowflakes(lst):
         return True
     return list(filter(func, lst))
 
+
 class Codenames(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.codenames_timeout = None
-    
+
     @commands.command(name="codenames-teams", usage="<user @mentions or names>",
-    brief="Starts a new game of codenames.", help="Starts a new game of codenames in the current server. \
+                      brief="Starts a new game of codenames.", help="Starts a new game of codenames in the current server. \
 The server must have roles named 'blue spy' and 'red spy' (case insensitive). Users are taken from the message, \
 either via @mention or EXACTLY the same username/nick.")
     @commands.guild_only()
@@ -40,7 +45,7 @@ either via @mention or EXACTLY the same username/nick.")
 
         if type(members) != list:
             members = list()
-        
+
         members.extend(msg.mentions)
 
         first_space = msg.content.find(" ")
@@ -50,7 +55,7 @@ either via @mention or EXACTLY the same username/nick.")
                 result = msg.guild.get_member_named(name.strip())
                 if result != None:
                     members.append(result)
-        
+
         members = remove_duplicate_snowflakes(members)
         random.shuffle(members)
 
@@ -64,19 +69,19 @@ either via @mention or EXACTLY the same username/nick.")
                 await member.remove_roles(blue_spy, reason="Codenames teaming")
             await member.add_roles(red_spy, reason="Codenames teaming")
             output_red += "\n<@{}>".format(member.id)
-        
+
         output_blue = "**Blue Team:**"
         for member in blue_team:
             if member in red_spy.members:
                 await member.remove_roles(red_spy, reason="Codenames teaming")
             await member.add_roles(blue_spy, reason="Codenames teaming")
             output_blue += "\n<@{}>".format(member.id)
-        
+
         await ctx.send(output_red)
         await ctx.send(output_blue)
-        
+
     @commands.command(name="codenames-over", brief="Ends the current session of codenames.",
-    help="Ends the current session of codenames. Will remove the roles 'red spy' and 'blue spy' from \
+                      help="Ends the current session of codenames. Will remove the roles 'red spy' and 'blue spy' from \
 anyone in the server.")
     @commands.guild_only()
     async def codenames_over(self, ctx):
@@ -88,14 +93,14 @@ anyone in the server.")
 
         for member in red_spy.members:
             await member.remove_roles(red_spy, reason="Codenames over")
-        
+
         for member in blue_spy.members:
             await member.remove_roles(blue_spy, reason="Codenames over")
-        
+
         await msg.add_reaction("✅")
 
     @commands.command(name="codenames-shuffle", brief="Suffles the teams in codenames.",
-    help="Shuffles the teams in the current session of codenames. This will shuffle anyone with the red or \
+                      help="Shuffles the teams in the current session of codenames. This will shuffle anyone with the red or \
 blue spy roles, and then act like codenames-teams.")
     @commands.guild_only()
     async def codenames_shuffle(self, ctx):
