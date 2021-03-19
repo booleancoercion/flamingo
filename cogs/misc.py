@@ -181,11 +181,3 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
 
             bestof = self.bot.get_channel(BESTOF_ID) # best of flamingo
             await bestof.send(embed=embed)
-    
-    @commands.Cog.listener(name="on_message")
-    async def protect_movies(self, msg):
-        if msg.channel.id != MOVIES_ID:
-            return
-        
-        if msg.author.id in MOVIES_BLACKLIST:
-            await msg.delete()
