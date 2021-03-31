@@ -165,7 +165,7 @@ For example, to roll 2 dice of 12 sides, do fl!roll 2d12")
             name="Source",
             value="[Jump!]({0})".format(msg.jump_url)
         )
-        if msg.author.id == 728859615898632193:  # predictabot
+        if msg.author.id in [728859615898632193, 825253664972865556]:  # predictabot
             prediction = msg.embeds[0]
             embed.set_author(
                 name=prediction.author.name,
