@@ -1,3 +1,6 @@
+import asyncio
+import requests
+
 from discord.ext import commands
 import discord
 
@@ -88,11 +91,35 @@ def check_banned(ctx):
     return True
 
 
+already_on = False
+general_id = 765683708509945906
+general = None
+
+
 @bot.event
 async def on_ready():
     print("Logged in as", bot.user)
     act = discord.Activity(name="fl!help", type=discord.ActivityType.listening)
     await bot.change_presence(status=discord.Status.online, activity=act)
+
+    global already_on, general
+    if not already_on:
+        already_on = True
+        general = bot.get_channel(general_id)
+        await revive_general()
+
+
+async def revive_general():
+    while True:
+        try:
+            r = requests.get(
+                "https://uselessfacts.jsph.pl/random.json?language=en")
+            text = r.json()["text"]
+            await general.send("Fun Fact: {0}".format(text))
+        except Exception:
+            pass
+
+        await asyncio.sleep(1800)  # 30 minutes
 
 
 @bot.event
