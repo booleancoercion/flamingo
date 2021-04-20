@@ -119,7 +119,7 @@ async def revive_general():
         except Exception:
             pass
 
-        await asyncio.sleep(1800)  # 30 minutes
+        await asyncio.sleep(60*60*2)  # 2 hours
 
 
 @bot.event
