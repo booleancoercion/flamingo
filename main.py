@@ -31,7 +31,7 @@ intents.reactions = True
 help_command = commands.DefaultHelpCommand()
 
 bot = commands.Bot(
-    command_prefix=["fl!", "Fl!", "fL!", "FL!"],
+    command_prefix=["fl!", "Fl!", "fL!", "FL!", "of", "Of", "oF", "OF"],
     owner_id=214732126950522880,
     intents=intents,
     help_command=help_command
